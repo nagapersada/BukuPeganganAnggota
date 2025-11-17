@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta tag penting untuk instalasi & full screen -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Compound">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#111827">
+    
+    <!-- Link ke manifest file -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Link ke ikon aplikasi untuk iPhone -->
+    <link rel="apple-touch-icon" href="1000166668.png"> 
+    
+    <title>Compound - Kalkulator Potensi</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-dark-gradient: linear-gradient(145deg, #111827, #0c0a09);
+            --surface-color: #1f2937;
+            --primary-accent: #d4af37;
+            --accent-gradient: linear-gradient(45deg, #d4af37, #f0c54a);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border-color: #374151;
+            --profit-color: #22c55e;
+            --danger-color: #ef4444;
+            --shadow-color: rgba(0, 0, 0, 0.25);
+            --focus-ring-color: rgba(212, 175, 55, 0.3);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #0c0a09;
+            background-image: var(--bg-dark-gradient);
+            color: var(--text-primary);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* === STRUKTUR SLIDE === */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s, visibility 0.6s;
+            overflow-y: auto;
+        }
+        
+        /* Slide 1: Motivasi */
+        #slide1 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        #slide1 .logo { width: 150px; margin-bottom: 2rem; }
+        #slide1 h1 { font-size: clamp(2.2rem, 10vw, 3.5rem); margin-bottom: 1rem; }
+        #slide1 p { font-size: 1.1rem; max-width: 600px; color: var(--text-secondary); line-height: 1.7; }
+        
+        /* Slide 2: Kalkulator */
+        #slide2 {
+            transform: translateX(100%);
+            opacity: 0;
+            visibility: hidden;
+            padding: 0.5rem; /* Padding sangat kecil untuk layar ponsel */
+        }
+        @media (min-width: 768px) { 
+            #slide1 { padding: 3rem; }
+            #slide2 { padding: 3rem; }
+        }
+
+
+        /* State ketika kalkulator aktif */
+        body.kalkulator-aktif #slide1 {
+            transform: translateX(-100%);
+            opacity: 0;
+            visibility: hidden;
+        }
+        body.kalkulator-aktif #slide2 {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* === KONTEN KALKULATOR === */
+        .container {
+            width: 100%; /* Lebar penuh */
+            margin: auto; 
+            background: var(--surface-color);
+            padding: 1rem; /* Padding lebih kecil untuk ponsel */
+            border-radius: 24px; 
+            box-shadow: 0 25px 50px -12px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+        @media (min-width: 768px) { 
+            .container { padding: 3rem; }
+        }
+
+        h1, h2 {
+            text-align: center; font-weight: 700; line-height: 1.35; 
+            background: var(--accent-gradient); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; letter-spacing: -1px;
+        }
+        h2 { font-size: clamp(1.8rem, 9.5vw, 2.75rem); margin-bottom: 0.75rem; }
+        
+        .kurs-display {
+            text-align: center; margin-bottom: 2rem; color: var(--text-secondary);
+            font-size: 1rem; transition: color 0.3s ease; line-height: 1.5;
+        }
+
+        .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        label {
+            font-weight: 500; font-size: 0.875rem; margin-bottom: 0.6rem;
+            display: block; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        input[type="number"] {
+            width: 100%; padding: 0.85rem 1rem; border-radius: 12px;
+            border: 1px solid var(--border-color); background-color: #111827;
+            font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--text-primary);
+            transition: all 0.2s ease-in-out; box-sizing: border-box; 
+        }
+        input[type="number"]:focus {
+            outline: none; border-color: var(--primary-accent);
+            box-shadow: 0 0 0 4px var(--focus-ring-color); background-color: var(--surface-color);
+        }
+        
+        .checkbox-container { grid-column: 1 / -1; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 0.5rem; }
+        .checkbox-group label {
+            display: flex; align-items: center; gap: 0.75rem;
+            font-weight: 500; font-size: 1rem; cursor: pointer;
+            color: var(--text-primary); text-transform: none; letter-spacing: 0;
+        }
+
+        input[type="checkbox"] {
+            appearance: none; width: 1.35em; height: 1.35em;
+            border: 2px solid var(--border-color); border-radius: 6px;
+            display: grid; place-content: center; transition: all 0.2s;
+        }
+        input[type="checkbox"]::before {
+            content: ''; width: 0.75em; height: 0.75em;
+            transform: scale(0); transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--primary-accent);
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        input[type="checkbox"]:checked { background-color: var(--primary-accent); border-color: var(--primary-accent); }
+        input[type="checkbox"]:checked::before { transform: scale(1.1); box-shadow: inset 1em 1em var(--surface-color); }
+        
+        .button-container { grid-column: 1 / -1; margin-top: 2rem; }
+        button {
+            padding: 1rem 2rem; background-image: var(--accent-gradient);
+            color: #111827; border: none; border-radius: 12px;
+            cursor: pointer; font-size: 1rem; font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px -5px rgba(212, 175, 55, 0.4);
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px -5px rgba(212, 175, 55, 0.5);
+        }
+
+        .button-center { display: flex; justify-content: center; }
+        .button-motivasi { min-width: 250px; font-size: 1.1rem; padding: 1.2rem 2.5rem; }
+        
+        .back-button {
+            position: fixed; top: 1rem; left: 1rem;
+            background: rgba(31, 41, 55, 0.8); 
+            backdrop-filter: blur(5px);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color); font-weight: 500;
+            padding: 0.6rem 1.2rem; z-index: 100;
+        }
+        .back-button:hover { background: #111827; color: var(--text-primary); }
+
+        .table-container {
+            overflow: auto; max-height: 550px; margin-top: 2rem;
+            border: 1px solid var(--border-color); border-radius: 16px;
+        }
+        table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+        th {
+            background-color: #111827; padding: 0.8rem 1rem; color: var(--text-secondary);
+            font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;
+            position: sticky; top: 0; text-align: center; z-index: 10; 
+        }
+        td { 
+            padding: 0.8rem 1rem; 
+            text-align: right; 
+            white-space: nowrap; 
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s ease;
+        }
+        td.is-pressing {
+            transform: scale(0.95);
+            background-color: var(--primary-accent) !important;
+            color: #111827 !important;
+        }
+        td.is-pressing .gold-symbol { color: #111827 !important; }
+        tbody tr { border-bottom: 1px solid var(--border-color); transition: background-color 0.2s ease; }
+        td:first-child { text-align: center; position: sticky; left: 0; background-color: var(--surface-color); z-index: 5; cursor: default; }
+        th:first-child { position: sticky; left: 0; background-color: #111827; z-index: 15; }
+        tr:last-child { border-bottom: none; }
+        tbody tr:hover { background-color: #2a374a; }
+        tbody tr:hover td, tbody tr:hover td:first-child { background-color: #2a374a; }
+        
+        .profit-cell { color: var(--profit-color); font-weight: 500; }
+        .gold-symbol { color: var(--primary-accent); font-weight: 500; margin-right: 2px; transition: color 0.1s; }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(17, 24, 39, 0.8); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background-color: var(--surface-color); padding: 2.5rem; border-radius: 20px;
+            text-align: center; position: relative; transform: scale(0.9);
+            transition: transform 0.3s ease; border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px -12px var(--shadow-color);
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-close {
+            position: absolute; top: 15px; right: 20px; font-size: 2rem;
+            color: var(--text-secondary); cursor: pointer; line-height: 1;
+            transition: color 0.2s ease;
+        }
+        .modal-close:hover { color: var(--text-primary); }
+        #modalUsdValue { margin: 0; font-size: 1.5rem; color: var(--text-secondary); }
+        #modalIdrValue {
+            margin: 0.5rem 0 0 0; font-size: 2.5rem; font-weight: 700;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="slide1" class="slide">
+        <img src="1000166668.png" alt="Logo" class="logo">
+        <h1>Selamat Datang di Compound</h1>
+        <p>Setiap keuntungan kecil yang Anda putar kembali adalah benih untuk pohon kekayaan di masa depan. Temukan kekuatan compounding dan saksikan bagaimana konsistensi membangun hasil yang eksponensial.</p>
+        <button class="button button-motivasi" onclick="tampilkanKalkulator()">Mulai Simulasi</button>
+    </div>
+
+    <div id="slide2" class="slide">
+        <button class="button back-button" onclick="tampilkanMotivasi()">&larr; Kembali</button>
+        <div class="container">
+            <h2>Kalkulator Compound</h2>
+            <div id="kursDisplay" class="kurs-display">Memuat kurs real-time...</div>
+
+            <div class="form-grid">
+                <div>
+                    <label for="modal">Modal Awal (USDT)</label>
+                    <input type="number" id="modal" value="100" step="0.01">
+                </div>
+                <div>
+                    <label for="targetHari">Target Hari</label>
+                    <input type="number" id="targetHari" value="41" min="1">
+                </div>
+                <div>
+                    <label for="bep">Target Profit per Transaksi (%)</label>
+                    <input type="number" id="bep" value="0.85" step="0.01">
+                </div>
+                <div class="checkbox-container">
+                    <label>Transaksi yang Aktif</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="siang" checked> Siang</label>
+                        <label><input type="checkbox" id="sinyal4"> Sinyal ke-4</label>
+                        <label><input type="checkbox" id="sinyal3"> Sinyal ke-3</label>
+                        <label><input type="checkbox" id="malam" checked> Malam</label>
+                    </div>
+                </div>
+                <div class="button-container button-center">
+                    <button onclick="hitungCompounding()">Hitung Potensi</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="hasilTabel">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="konversiModal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="modalClose" class="modal-close">&times;</span>
+            <h3 id="modalUsdValue"></h3>
+            <p id="modalIdrValue"></p>
+        </div>
+    </div>
+
+    <script>
+        // === NAVIGASI ANTAR SLIDE ===
+        function tampilkanKalkulator() {
+            document.body.classList.add('kalkulator-aktif');
+        }
+
+        function tampilkanMotivasi() {
+            document.body.classList.remove('kalkulator-aktif');
+        }
+
+        // === LOGIKA KALKULATOR ===
+        let liveKursUsdToIdr = 16300; 
+
+        const idrFormatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+
+        async function fetchAndUpdateKurs() {
+            const kursDisplayElement = document.getElementById('kursDisplay');
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=idr');
+                if (!response.ok) throw new Error('Gagal mengambil data kurs dari CoinGecko.');
+                const data = await response.json();
+                liveKursUsdToIdr = parseFloat(data.tether.idr);
+                const formattedKurs = new Intl.NumberFormat('id-ID').format(liveKursUsdToIdr);
+                kursDisplayElement.innerHTML = `Kurs Global Real-Time:<br>1 USDT = Rp ${formattedKurs}`;
+            } catch (error) {
+                console.error('Error fetching exchange rate:', error);
+                const formattedFallback = new Intl.NumberFormat('id-ID').format(liveKursUsdToIdr);
+                kursDisplayElement.innerHTML = `Gagal memuat kurs. Menggunakan kurs default: <br>1 USDT = Rp ${formattedFallback}`;
+                kursDisplayElement.style.color = 'var(--danger-color)';
+            }
+        }
+        
+        function formatUsdCurrency(number) {
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            const parts = formatter.formatToParts(number);
+            let htmlString = '';
+            for (const part of parts) {
+                if (part.type === 'currency') {
+                    htmlString += `<span class="gold-symbol">${part.value}</span>`;
+                } else {
+                    htmlString += part.value;
+                }
+            }
+            return htmlString;
+        }
+
+        function hitungCompounding() {
+            const modalAwal = parseFloat(document.getElementById('modal').value) || 0;
+            const targetHari = parseInt(document.getElementById('targetHari').value) || 1;
+            const bep = parseFloat(document.getElementById('bep').value) / 100 || 0;
+            const aktif = {
+                siang: document.getElementById('siang').checked,
+                sinyal4: document.getElementById('sinyal4').checked,
+                sinyal3: document.getElementById('sinyal3').checked,
+                malam: document.getElementById('malam').checked
+            };
+            const thead = document.querySelector('#hasilTabel thead');
+            const tbody = document.querySelector('#hasilTabel tbody');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            let headerHTML = '<tr><th>Hari</th><th>Modal Awal</th>';
+            if (aktif.siang) headerHTML += '<th>Profit Siang</th>';
+            if (aktif.sinyal4) headerHTML += '<th>Profit Sinyal-4</th>';
+            if (aktif.sinyal3) headerHTML += '<th>Profit Sinyal-3</th>';
+            if (aktif.malam) headerHTML += '<th>Profit Malam</th>';
+            headerHTML += '<th>Modal Akhir</th><th>Total Profit</th></tr>';
+            thead.innerHTML = headerHTML;
+            
+            let saldo = modalAwal;
+            let totalProfit = 0;
+
+            for (let hari = 1; hari <= targetHari; hari++) {
+                let modalAwalHari = saldo;
+                let profitSiang = 0, profitSinyal4 = 0, profitSinyal3 = 0, profitMalam = 0;
+
+                if (aktif.siang) { profitSiang = saldo * bep; saldo += profitSiang; }
+                if (aktif.sinyal4) { profitSinyal4 = saldo * bep; saldo += profitSinyal4; }
+                if (aktif.sinyal3) { profitSinyal3 = saldo * bep; saldo += profitSinyal3; }
+                if (aktif.malam) { profitMalam = saldo * bep; saldo += profitMalam; }
+
+                let modalAkhir = saldo;
+                let keuntunganHarian = modalAkhir - modalAwalHari;
+                totalProfit += keuntunganHarian;
+                
+                let rowHTML = `<tr>
+                    <td>${hari}</td>
+                    <td data-usd-value="${modalAwalHari.toFixed(2)}">${formatUsdCurrency(modalAwalHari)}</td>`;
+                
+                if (aktif.siang) rowHTML += `<td class="profit-cell" data-usd-value="${profitSiang.toFixed(2)}">${formatUsdCurrency(profitSiang)}</td>`;
+                if (aktif.sinyal4) rowHTML += `<td class="profit-cell" data-usd-value="${profitSinyal4.toFixed(2)}">${formatUsdCurrency(profitSinyal4)}</td>`;
+                if (aktif.sinyal3) rowHTML += `<td class="profit-cell" data-usd-value="${profitSinyal3.toFixed(2)}">${formatUsdCurrency(profitSinyal3)}</td>`;
+                if (aktif.malam) rowHTML += `<td class="profit-cell" data-usd-value="${profitMalam.toFixed(2)}">${formatUsdCurrency(profitMalam)}</td>`;
+
+                rowHTML += `<td data-usd-value="${modalAkhir.toFixed(2)}">${formatUsdCurrency(modalAkhir)}</td>
+                    <td class="profit-cell" data-usd-value="${totalProfit.toFixed(2)}">${formatUsdCurrency(totalProfit)}</td>
+                </tr>`;
+                tbody.insertAdjacentHTML('beforeend', rowHTML);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAndUpdateKurs().then(() => {
+                hitungCompounding();
+            });
+
+            const modalOverlay = document.getElementById('konversiModal');
+            const modalUsdValue = document.getElementById('modalUsdValue');
+            const modalIdrValue = document.getElementById('modalIdrValue');
+            const modalClose = document.getElementById('modalClose');
+            const tableBody = document.querySelector('#hasilTabel tbody');
+            const modalInput = document.getElementById('modal');
+
+            const showModal = (usdValue) => {
+                const idrValue = usdValue * liveKursUsdToIdr;
+                modalUsdValue.innerHTML = formatUsdCurrency(usdValue);
+                modalIdrValue.textContent = idrFormatter.format(idrValue);
+                modalOverlay.classList.add('active');
+            };
+            const hideModal = () => modalOverlay.classList.remove('active');
+
+            // --- FUNGSI SENTUH, TAHAN, DAN SALIN (SOLUSI FINAL) ---
+            let pressTimer = null;
+            let longPressTriggered = false;
+            let pressedCell = null;
+            let touchStartX = 0;
+            let touchStartY = 0;
+            const moveThreshold = 10; // Jarak toleransi gerakan jari dalam piksel
+
+            const handlePressStart = (event) => {
+                const cell = event.target.closest('td');
+                if (!cell) return;
+
+                const isModalAkhirCell = cell.parentElement.children.length > 1 && cell === cell.parentElement.children[cell.parentElement.children.length - 2];
+                if (isModalAkhirCell) {
+                    if (event.type === 'touchstart') {
+                        touchStartX = event.touches[0].clientX;
+                        touchStartY = event.touches[0].clientY;
+                    }
+                    
+                    longPressTriggered = false;
+                    pressedCell = cell;
+                    
+                    pressTimer = setTimeout(() => {
+                        longPressTriggered = true;
+                        pressedCell.classList.add('is-pressing');
+                        const usdValue = parseFloat(cell.getAttribute('data-usd-value'));
+                        if (!isNaN(usdValue)) {
+                            modalInput.value = usdValue.toFixed(2);
+                            hitungCompounding();
+                            
+                            modalInput.style.transition = 'none';
+                            modalInput.style.boxShadow = '0 0 0 4px var(--focus-ring-color)';
+                            setTimeout(() => {
+                                modalInput.style.transition = 'all 0.2s ease-in-out';
+                                modalInput.style.boxShadow = 'none';
+                            }, 500);
+                        }
+                    }, 600); // Durasi tahan 0.6 detik
+                }
+            };
+
+            const handlePressMove = (event) => {
+                if (!pressTimer) return;
+                
+                const touch = event.touches[0];
+                const moveX = Math.abs(touch.clientX - touchStartX);
+                const moveY = Math.abs(touch.clientY - touchStartY);
+
+                if (moveX > moveThreshold || moveY > moveThreshold) {
+                    clearTimeout(pressTimer);
+                    if (pressedCell) {
+                        pressedCell.classList.remove('is-pressing');
+                    }
+                    pressTimer = null;
+                }
+            };
+
+            const handlePressEnd = () => {
+                clearTimeout(pressTimer);
+                if (pressedCell) {
+                    pressedCell.classList.remove('is-pressing');
+                }
+                // Reset longPressTriggered setelah sedikit jeda agar 'click' tidak terpanggil
+                setTimeout(() => {
+                    longPressTriggered = false;
+                }, 50);
+            };
+
+            const handleClick = (event) => {
+                if (longPressTriggered) {
+                    event.preventDefault();
+                    return;
+                }
+                const cell = event.target.closest('td');
+                if (cell && cell.hasAttribute('data-usd-value') && !event.target.classList.contains('gold-symbol')) {
+                    const usdValue = parseFloat(cell.getAttribute('data-usd-value'));
+                    showModal(usdValue);
+                }
+            };
+
+            tableBody.addEventListener('mousedown', handlePressStart);
+            tableBody.addEventListener('touchstart', handlePressStart, { passive: false });
+
+            tableBody.addEventListener('touchmove', handlePressMove, { passive: false });
+
+            tableBody.addEventListener('mouseup', handlePressEnd);
+            tableBody.addEventListener('mouseleave', handlePressEnd);
+            tableBody.addEventListener('touchend', handlePressEnd);
+            tableBody.addEventListener('touchcancel', handlePressEnd);
+            
+            tableBody.addEventListener('click', handleClick);
+
+            modalClose.addEventListener('click', hideModal);
+            modalOverlay.addEventListener('click', (event) => {
+                if (event.target === modalOverlay) hideModal();
+            });
+        });
+    </script>
+</body>
+</html>
+
+
