@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DVTEAM NP - Presentasi Motivasi</title>
+    <style>
+        /* PERBAIKAN UMUM: Menggunakan tinggi yang lebih stabil di iOS */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #E0E0E0;
+            height: 100%; 
+            overflow: hidden; 
+            background-color: #121212;
+            touch-action: pan-x pan-y;
+        }
+        
+        .slide-container {
+            width: 200vw;
+            /* Menggunakan tinggi body agar lebih stabil di iOS */
+            height: 100%; 
+            display: flex;
+            transition: transform 0.8s ease-in-out;
+            position: relative;
+            top: 0;
+            left: 0;
+        }
+
+        .slide {
+            width: 100vw;
+            /* Menggunakan tinggi body agar lebih stabil di iOS */
+            height: 100%; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-sizing: border-box;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Slide 1: Logo dan Motivasi */
+        #slide1 {
+            background-color: #121212;
+            justify-content: space-evenly; 
+        }
+
+        #slide1 .logo {
+            max-width: 250px;
+            width: 60%; 
+            height: auto;
+            margin-top: 20px; 
+        }
+
+        #slide1 h1 {
+            font-size: 2em;
+            color: #FFD700;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+            padding: 0 10px;
+        }
+
+        #slide1 p {
+            font-size: 1em;
+            max-width: 80%;
+            margin: 10px 0 30px 0; 
+            line-height: 1.4;
+            padding: 0 10px;
+            flex-grow: 0; 
+        }
+
+        .button {
+            background-color: #FFD700;
+            color: #121212;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 80%;
+            max-width: 300px;
+            margin-bottom: 20px; 
+        }
+
+        /* Slide 2: Background Obor dan Audio Player */
+        #slide2 {
+            /* FILE BARU: Menggunakan gambar yang Anda berikan */
+            background-image: url('1000175932.jpg');
+            
+            /* PENYESUAIAN: Menggunakan 'cover' agar gambar baru memenuhi layar */
+            background-size: cover; 
+            background-repeat: no-repeat;
+            background-position: center center; /* Posisi di tengah */
+            
+            justify-content: flex-end; 
+            padding-bottom: 0;
+            padding-top: 0;
+        }
+
+        /* Overlay tipis */
+        #slide2::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.1); 
+            z-index: 1;
+        }
+
+        /* Kontainer khusus untuk memposisikan audio player di bawah tengah */
+        .slide-content-bottom-center {
+            position: relative; 
+            margin-bottom: 5%; 
+            width: 85%;
+            max-width: 350px; 
+            z-index: 2;
+        }
+
+        .audio-player-container {
+            background: rgba(18, 18, 18, 0.95);
+            padding: 15px 20px; 
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            text-align: center;
+        }
+
+        .audio-player-container h2 {
+            color: #FFD700;
+            margin-top: 0;
+            margin-bottom: 10px; 
+            font-size: 1.1em; 
+        }
+        
+        /* PERBAIKAN 2: Pastikan audio player memiliki z-index yang tinggi */
+        audio {
+            width: 100%;
+            filter: invert(1) hue-rotate(180deg);
+            position: relative; /* Tambahkan relative position */
+            z-index: 10; /* Z-index tinggi */
+        }
+
+        /* Kontrol untuk perpindahan slide */
+        .show-slide-2 {
+            transform: translateX(-100vw);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container" id="slideContainer">
+        
+        <div class="slide" id="slide1">
+            <img src="logo.jpg" alt="DVTEAM NP Logo" class="logo">
+            
+            <h1>✨ EDUKASI, SISTEM, AMANAH ✨</h1>
+            <p>
+                "Kita tidak hanya bekerja untuk hari ini. Kita membangun warisan kerja, identitas tim, dan sistem yang akan terus mendidik. Inilah wajah kita, inilah amanah kita."
+            </p>
+            
+            <button class="button" onclick="goToSlide(2)">
+                MASUK KE MATERI AUDIO
+            </button>
+        </div>
+
+        <div class="slide" id="slide2">
+            <div class="slide-content-bottom-center">
+                <div class="audio-player-container">
+                    
+                    <h2>🎧 AMANAH TIM: FUNGSI GRUP & EDUKASI 🎧</h2>
+                    
+                    <audio controls preload="auto">
+                        <source src="amanah(2).mp3" type="audio/mpeg">
+                        Browser Anda tidak mendukung elemen audio.
+                    </audio>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const forceFullScreen = () => {
+            // Coba menyembunyikan address bar.
+            window.scrollTo(0, 1);
+            
+            // Coba Fullscreen API.
+            const doc = document.documentElement;
+            if (doc.requestFullscreen) {
+                doc.requestFullscreen();
+            } else if (doc.webkitRequestFullscreen) {
+                doc.webkitRequestFullscreen();
+            }
+        };
+
+        function goToSlide(slideNumber) {
+            const container = document.getElementById('slideContainer');
+            if (slideNumber === 2) {
+                container.classList.add('show-slide-2');
+                forceFullScreen(); 
+                
+            } else if (slideNumber === 1) {
+                container.classList.remove('show-slide-2');
+            }
+        }
+        
+        window.addEventListener('load', forceFullScreen);
+        window.addEventListener('orientationchange', forceFullScreen);
+    </script>
+
+</body>
+</html>
