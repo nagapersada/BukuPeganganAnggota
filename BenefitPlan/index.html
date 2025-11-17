@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DVTEAM NP - Benefit Plan</title>
+    
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/BenefitPlan/manifest.json">
+    <link rel="apple-touch-icon" href="/BenefitPlan/images/apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+         body { font-family: 'Inter', sans-serif; background-color: #020617; background-image: radial-gradient(ellipse at top, #1e293b, #020617); color: #cbd5e1; overflow: hidden; }
+        #splash-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; padding: 1.5rem; text-align: center; animation: fadeIn 1s ease-out forwards; position: fixed; top: 0; left: 0; width: 100%; z-index: 100; background-color: #020617; }
+        .splash-logo { max-width: 300px; width: 100%; height: auto; margin-bottom: 1.5rem; }
+        .splash-title { font-size: 2rem; font-weight: 800; color: #f0f9ff; letter-spacing: -0.025em; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
+        .splash-subtitle { font-size: 1rem; color: #94a3b8; margin-top: 0.5rem; max-width: 400px; }
+        .enter-button { margin-top: 2.5rem; background: linear-gradient(to right, #eab308, #f59e0b); color: #1e293b; padding: 0.75rem 2rem; font-weight: 700; border-radius: 0.5rem; box-shadow: 0 4px 20px -1px rgb(234 179 8 / 0.4); transition: all 0.3s ease; cursor: pointer; }
+        .enter-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 7px 25px -1px rgb(234 179 8 / 0.5); }
+        #dashboard-content { display: none; height: 100vh; overflow-y: auto; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-10px);} } 
+        @keyframes pulse-update { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes blink { 0%, 100% { opacity: 1; text-shadow: 0 0 15px #fcd34d, 0 0 5px #fef3c7; } 50% { opacity: 0.2; text-shadow: none; } }
+        .juara-text { animation: blink 0.8s infinite alternate; }
+        .card { background-color: rgba(30, 41, 59, 0.6); border-radius: 0.75rem; border: 1px solid; border-image-source: linear-gradient(to bottom right, #334155, rgba(51, 65, 85, 0)); border-image-slice: 1; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .number-pulse { animation: pulse-update 0.4s ease-out; }
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; display: none; }
+        .action-btn-icon-only { display: flex; align-items: center; justify-content: center; background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; width: 48px; height: 48px; border-radius: 0.5rem; transition: all 0.2s ease; cursor: pointer; }
+        .action-btn-icon-only:hover:not(:disabled) { background-color: #334155; color: #f1f5f9; }
+        .action-btn-icon-only:disabled { background-color: #263347; color: #64748b; border-color: #334155; opacity: 0.7; cursor: not-allowed; }
+        .action-btn-icon-only.clicked { background-color: #166534; color: #dcfce7; border-color: #22c55e; }
+        .action-item { display: flex; flex-direction: column; align-items: center; }
+        .action-label { margin-top: 0.375rem; font-size: 0.75rem; line-height: 1rem; color: #94a3b8; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <img src="/BenefitPlan/images/logo-splash.png" alt="DVTEAM NP Logo" class="splash-logo">
+        <h1 class="splash-title">Raih Potensi Puncak Anda</h1>
+        <p class="splash-subtitle">Selamat datang di Simulator Benefit Plan. Alat bantu eksklusif untuk merancang masa depan dan kesuksesan tim Anda.</p>
+        <button id="enter-button" class="enter-button">MASUK SIMULATOR</button>
+    </div>
+
+    <div id="dashboard-content">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="container mx-auto p-4 md:p-6 max-w-6xl relative z-10">
+            <header class="text-center mb-8">
+               <div class="flex justify-center items-center">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Dashboard Proyeksi Benefit Plan</h1>
+                    <button id="play-audio-button" title="Putar Panduan Audio" class="ml-3 text-slate-400 hover:text-cyan-400 transition-colors duration-300 p-2">
+                        <svg id="speaker-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                        <svg id="speaker-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l-5-5m0 5l5-5" /></svg>
+                    </button>
+                </div>
+                <p class="text-slate-400 mt-3 max-w-xl mx-auto text-sm">Alat bantu visual untuk merencanakan strategi dan memaksimalkan potensi pertumbuhan tim Anda.</p>
+            </header>
+    
+            <div class="grid grid-cols-1 gap-4">
+                <div class="space-y-4">
+                     <div class="card p-4">
+                        <div class="space-y-2 px-2">
+                            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Bonus Reveral Lv.1 (5%)</span><span class="font-semibold text-emerald-400" id="resBonusReveral1"></span></div>
+                            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Bonus Reveral Lv.2 (2%)</span><span class="font-semibold text-emerald-400" id="resBonusReveral2"></span></div>
+                            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Bonus Tim</span><span class="font-semibold text-emerald-400" id="resBonusTim"></span></div>
+                        </div>
+                    </div>
+    
+                    <div class="card p-5 pb-40 sticky top-6">
+                        <div class="flex items-center justify-between mb-5">
+                            
+                            <div class="space-y-2"> 
+                                <div class="flex flex-col justify-center"><div class="text-center"><div class="flex items-center justify-center space-x-2"><div id="anda-label" class="bg-blue-200 text-blue-800 font-bold text-xs px-3 py-1 rounded-full transition-colors duration-300">ANDA</div><div id="crown-icon" class="hidden"><span class="text-base">👑</span></div></div><div id="ketua-tim-label" class="mt-1 h-4"></div></div></div>
+                                
+                                <div>
+                                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Status & Peringkat</p>
+                                    <div class="flex items-center space-x-2 mt-1 whitespace-nowrap"><div id="kpiStatus"></div><div id="kpiBonusPeringkat" class="font-bold text-emerald-400 text-lg"></div></div>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Batasan Modal</p>
+                                    <p class="font-bold text-white text-base" id="resBatasanModal"></p>
+                                </div>
+                                
+                                <div class="pt-1">
+                                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Anggota</p>
+                                    <p class="font-bold text-white text-base" id="resTotalAnggotaPanel"></p>
+                                </div>
+                                
+                                <div class="space-y-1 pt-2" id="sinyalContainer">
+                                    </div>
+
+                                 <div id="action-button-container" class="pt-4 mt-4 border-t border-slate-700">
+                                    <div id="phase-1-buttons" class="grid grid-cols-4 gap-4 w-full"> 
+                                        <div class="action-item"> <button id="btn-tanya" onclick="handlePhase1Click('tanya')" class="action-btn-icon-only"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8-5a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-1.5 0v-.5A.75.75 0 0 1 10 5Zm0 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" /></svg> </button> <span class="action-label">Tanya</span> </div>
+                                        <div class="action-item"> <button id="btn-cerita" onclick="handlePhase1Click('cerita')" class="action-btn-icon-only"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M5 3.75A2.75 2.75 0 0 1 7.75 1h4.5A2.75 2.75 0 0 1 15 3.75v.443c.09.04.181.083.27.128C16.32 4.72 17 5.76 17 7v3a4 4 0 0 1-4 4h-1.062a4 4 0 0 0-3.876 0H7a4 4 0 0 1-4-4V7c0-1.24.68-2.28 1.73-2.679.089-.045.18-.088.27-.128V3.75ZM7.75 2.5a1.25 1.25 0 0 0-1.25 1.25v.191l.006.003.024.012c.108.05.213.102.313.155C7.83 4.41 8.25 5.137 8.25 6v1.25H6.5v-1c0-.966.784-1.75 1.75-1.75h-.5Z" clip-rule="evenodd" /></svg> </button> <span class="action-label">Cerita</span> </div>
+                                        <div class="action-item"> <button id="btn-undang" onclick="handlePhase1Click('undang')" class="action-btn-icon-only"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 8a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm2.64 1.15c-.13-.13-.28-.24-.45-.33a1.41 1.41 0 0 1-.36.33c-.17.09-.32.2-.45.33.13.13.28.24.45.33.13.09.28.2.45.33-.13-.13-.28-.24-.45-.33a1.41 1.41 0 0 1-.36.33c.17-.09.32-.2.45-.33Zm2.86 1.35a.75.75 0 0 0-1.06-1.06l-.97.97-.05.05a.75.75 0 0 0 1.11 1.01l.97-.97ZM12.75 15a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25v2.25a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V15Z" /></svg> </button> <span class="action-label">Undang</span> </div>
+                                        <div class="action-item"> <button id="btn-jelaskan" onclick="handlePhase1Click('jelaskan')" class="action-btn-icon-only"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v11A1.5 1.5 0 0 0 2.5 17h15a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 17.5 3h-15Zm3 11a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v3Zm4 0a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v6Zm4 0a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v2Zm4 0a.5.5 0 0 1-.5.5h-1a.SA5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4Z" /></svg> </button> <span class="action-label">Jelaskan</span> </div>
+                                    </div>
+                                    <div id="phase-2-buttons" class="hidden grid grid-cols-4 gap-4 w-full">
+                                        <div class="action-item"> <button id="btn-sapa" onclick="handlePhase2Click('sapa')" class="action-btn-icon-only"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M10 9a.75.75 0 0 1 .75.75v2.538l1.96-1.96a.75.75 0 0 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L6.22 12.16a.75.75 0 0 1 1.06-1.06l1.97 1.97V9.75A.75.75 0 0 1 10 9Z" /><path d="M3.5 9A1.5 1.5 0 0 1 5 7.5h1.879a.75.75 0 0 0 .53-.22l.662-.662A4.5 4.5 0 0 1 11.5 5.23v-1.48a.75.75 0 0 0-1.5 0v1.48a3 3 0 0 0-2.392 1.023l-.662.662a.75.75 0 0 0-.22.53V7.5h-1a.75.75 0 0 0 0 1.5h.145A3.001 3.001 0 0 0 3.5 12.355v.795a.75.75 0 0 0 1.5 0v-.795a1.5 1.5 0 0 1 1.145-1.455H15a1.5 1.5 0 0 1 1.5 1.5v3.85a.75.75 0 0 0 1.5 0V12.5A1.5 1.5 0 0 0 16.5 11h-1.879a.75.75 0 0 0-.53.22l-.662.662A4.5 4.5 0 0 1 10 13.26v-1.51a.75.75 0 0 0-1.5 0v1.51a3 3 0 0 0 2.392 2.977l.662.662a.75.75 0 0 0 .53.22H15a.75.75 0 0 0 0-1.5h-.145a3.001 3.001 0 0 0-2.64-2.645V11h1a.75.75 0 0 0 0-1.5h-.145A3.001 3.001 0 0 0 15 6.645V5.85a.75.75 0 0 0-1.5 0v.795a1.5 1.5 0 0 1-1.145 1.455H5.001a1.5 1.5 0 0 1-1.5-1.5V3.75a.75.75 0 0 0-1.5 0v3.75A1.5 1.5 0 0 0 3.5 9Z" /></svg> </button> <span class="action-label">Sapa</span> </div>
+                                        <div class="action-item"> <button id="btn-sharing" onclick="handlePhase2Click('sharing')" class="action-btn-icon-only"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M2.5 8.75a.75.75 0 0 0 0 1.5h.091a8.88 8.88 0 0 1 .414 3.033.75.75 0 0 0 1.48-.223A7.38 7.38 0 0 0 4.02 9.5h-1.52ZM17.5 8.75a.75.75 0 0 0 0 1.5h-.091a8.88 8.88 0 0 0-.414 3.033.75.75 0 0 0 1.48-.223A7.38 7.38 0 0 1 15.98 9.5h1.52Z" /><path fill-rule="evenodd" d="M8.27 3.076a.75.75 0 0 1 1.057.065l2.122 2.121a.75.75 0 0 1-.064 1.057 4.06 4.06 0 0 0-1.03 3.55.75.75 0 0 1-1.44-.328 2.56 2.56 0 0 1 .647-2.228l-1.028-1.028A.75.75 0 0 1 8.27 3.076Zm3.46 0a.75.75 0 0 0-1.057.065L8.55 5.262a.75.75 0 0 0 .064 1.057 4.06 4.06 0 0 1 1.03 3.55.75.75 0 0 0 1.44-.328 2.56 2.56 0 0 0-.647-2.228l1.028-1.028A.75.75 0 0 0 11.73 3.076Z" clip-rule="evenodd" /><path d="M12.25 11.5a.75.75 0 0 0-1.5 0v3.181a3.013 3.013 0 0 1-1.314.719l-.03.012a2.25 2.25 0 0 1-2.312 0l-.03-.012a3.013 3.013 0 0 1-1.314-.719V11.5a.75.75 0 0 0-1.5 0v3.181c0 .704.25 1.37.686 1.886l.03.036a3.75 3.75 0 0 0 4.93 0l.03-.036c.436-.516.686-1.182.686-1.886V11.5Z" /></svg> </button> <span class="action-label">Sharing</span> </div>
+                                        <div class="action-item"> <button id="btn-solusi" onclick="handlePhase2Click('solusi')" class="action-btn-icon-only"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10.5 2a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v.111a4.5 4.5 0 0 0-1.666 1.258A4.5 4.5 0 0 0 5.23 6.812a.5.5 0 0 0 .11.646l.006.006L8 10.05v.002a.5.5 0 0 1 .146.352v.001a.5.5 0 0 0 .146.352l.006.006a.5.5 0 0 0 .11.646 4.5 4.5 0 0 0 1.44 1.44.5.5 0 0 0 .646.11l.006.006a.5.5 0 0 1 .352.146v.001a.5.5 0 0 0 .352.146l.006.006a.5.5 0 0 0 .646.11 4.5 4.5 0 0 0 1.44-1.44.5.5 0 0 0 .11-.646l.006-.006a.5.5 0 0 1 .146-.352v-.001a.5.5 0 0 0 .146-.352l.006-.006a.5.5 0 0 0 .11-.646 4.5 4.5 0 0 0-1.44-1.44.5.5 0 0 0-.646-.11l-.006-.006A.5.5 0 0 1 12 7.05v-.002l2.648-2.648.006-.006a.5.5 0 0 0 .11-.646A4.5 4.5 0 0 0 13.125 2.11v-.11ZM10 6a.5.5 0 0 1 .5.5v1.284a.5.5 0 0 0 .146.352l.006.006a.5.5 0 0 1 .11.646 2.5 2.5 0 0 1-.8 1.49l-.007.007a.5.5 0 0 0-.352.146v.001a.5.5 0 0 1-.352.146l-.006.006a.5.5 0 0 0-.646.11 2.5 2.5 0 0 1-1.49.8l-.007.007a.5.5 0 0 1-.352.146h-.001a.5.5 0 0 0-.352.146l-.006.006a.5.5 0 0 1-.646.11 2.5 2.5 0 0 1-1.49-.8l-.007-.007a.5.5 0 0 0-.352-.146v-.001a.5.5 0 0 1-.352-.146l-.006-.006a.5.5 0 0 0-.646-.11 2.5 2.5 0 0 1-.8-1.49l-.007-.007A.5.5 0 0 1 5.5 7.91v-.001a.5.5 0 0 0 .146-.352l.006-.006A.5.5 0 0 1 5.76 6.9c.308-.507.713-.94 1.18-1.29l.007-.005a.5.5 0 0 0 .146-.352V6.5a.5.5 0 0 1 .5-.5h2.814Z" clip-rule="evenodd" /></svg> </button> <span class="action-label">Solusi</span> </div>
+                                        <div class="action-item"> <button id="btn-duplikasi" onclick="handlePhase2Click('duplikasi')" class="action-btn-icon-only"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10 2a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-1.5 0v-.5A.75.75 0 0 1 10 2ZM5.105 4.34a.75.75 0 0 0-1.06 1.06l1.745 1.745a.75.75 0 0 0 1.06-1.06l-1.745-1.745ZM9.85 5.4a.75.75 0 0 0-1.06-1.06l-1.745 1.745a.75.75 0 0 0 1.06 1.06l1.745-1.745ZM10 12.25a.75.75 0 0 1-.75.75v.5a.75.75 0 0 1 1.5 0v-.5a.75.75 0 0 1-.75-.75ZM2.75 10a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1-.75-.75ZM13 10a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1-.75-.75Zm-4.105 5.66a.75.75 0 0 0 1.06-1.06l-1.745-1.745a.75.75 0 0 0-1.06 1.06l1.745 1.745ZM4.34 14.895a.75.75 0 0 0 1.06 1.06l1.745-1.745a.75.75 0 0 0-1.06-1.06l-1.745 1.745ZM10 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" clip-rule="evenodd" /></svg> </button> <span class="action-label">Duplikasi</span> </div>
+                                    </div>
+                                    <div id="phase-3-buttons" class="hidden grid grid-cols-4 gap-4 w-full">
+                                        <div class="col-start-2 action-item"> <button id="btn-edifikasi" onclick="handlePhase3Click('edifikasi')" class="action-btn-icon-only w-full"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10 2.5a.75.75 0 0 1 .75.75v.255a.75.75 0 0 1-1.5 0V3.25a.75.75 0 0 1 .75-.75Zm-2.5 2.06a.75.75 0 0 0-1.06 1.06l.255.255a.75.75 0 0 0 1.06-1.06l-.255-.255ZM13.621 4.56a.75.75 0 0 0 1.06 1.06l.255-.255a.75.75 0 0 0-1.06-1.06l-.255.255ZM17.25 10a.75.75 0 0 1 .75.75v.255a.75.75 0 0 1-1.5 0V10.75a.75.75 0 0 1 .75-.75Zm-2.5-2.06a.75.75 0 0 0-1.06-1.06l-.255.255a.75.75 0 0 0 1.06 1.06l.255-.255ZM10 17.25a.75.75 0 0 1 .75.75v.255a.75.75 0 0 1-1.5 0V18a.75.75 0 0 1 .75-.75Zm-2.5-2.06a.75.75 0 0 0-1.06 1.06l.255.255a.75.75 0 0 0 1.06-1.06l-.255-.255ZM5.44 13.621a.75.75 0 0 0-1.06 1.06l.255.255a.75.75 0 0 0 1.06-1.06l-.255-.255ZM2.75 10a.75.75 0 0 1 .75.75v.255a.75.75 0 0 1-1.5 0V10.75a.75.75 0 0 1 .75-.75Zm2.06 2.5a.75.75 0 0 0 1.06 1.06l.255-.255a.75.75 0 0 0-1.06-1.06l-.255.255ZM10 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" clip-rule="evenodd" /></svg> </button> <span class="action-label">Edifikasi</span> </div>
+                                        <div class="action-item"> <button id="btn-duplikasi-level" onclick="handlePhase3Click('duplikasi')" class="action-btn-icon-only w-full"> <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" /><path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h6a2 2 0 00-2-2H5z" /></svg> </button> <span class="action-label">Duplikasi</span> </div>
+                                    </div>
+                                 </div>
+                            </div>
+                            
+                            <div class="text-right space-y-2"> 
+                                <div id="resSinyalSSM_OLD" class="hidden"></div>
+                                <div><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Bonus</p><p class="text-xl font-extrabold text-cyan-400" id="kpiTotalBonus"></p></div>
+                                <div><p class="text-slate-400 text-xs">Saldo Akun</p><p class="font-bold text-white text-base" id="resModalAwalPanel"></p></div>
+                                <div><p class="text-slate-400 text-xs">Bonus Volume</p><p class="font-bold text-cyan-400 text-base" id="resBonusVolume"></p></div>
+                                <div id="resSinyal3Panel_OLD" class="hidden"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4 pt-5 border-t border-slate-700" id="controls-body">
+                             </div>
+                        
+                        <div id="fokus-message" class="mt-8 text-center"><p class="text-sm font-bold uppercase text-amber-400 tracking-wider">Fokus Kepada 5 Anggota</p></div>
+                        <div id="juara-message-container" class="mt-8 text-center hidden"><h3 class="juara-text text-2xl md:text-3xl font-extrabold text-amber-400 tracking-wider">SELAMAT ANDA JUARA..!!</h3></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="tutorial-audio" src="benefit(2).mp3" preload="auto"></audio>
+    <audio id="champions-audio" src="Champions (2).mp3" preload="auto"></audio>
+
+    <script>
+        // --- Deklarasi Variabel Global ---
+        let anggotaLevels = [0, 0, 0, 0, 0]; 
+        let simulationMode = 'recruit_lv1'; 
+        let memberState = {};
+        let phase1ButtonsClicked = { tanya: false, cerita: false, undang: false, jelaskan: false }; 
+        let phase2ButtonsClicked = { sapa: false, sharing: false, solusi: false, duplikasi: false };
+        let phase3ButtonsClicked = { edifikasi: false, duplikasi: false };
+        let currentMemberIndex = 0; let currentBinaIndex = 0;   
+        let currentDuplicationState = { level: 2, memberIndex: 0 }; 
+        const members = ['A', 'B', 'C', 'D', 'E'];
+        let currentPhase = 1; 
+        let confettiInterval; let animationFrameId;
+
+        // --- Definisi Fungsi Simulator (Global Scope) ---
+        function resetMemberState() { memberState = { A: { isLeader: false, duplicationLevels: 0 }, B: { isLeader: false, duplicationLevels: 0 }, C: { isLeader: false, duplicationLevels: 0 }, D: { isLeader: false, duplicationLevels: 0 }, E: { isLeader: false, duplicationLevels: 0 }, }; }
+        function handlePhase1Click(buttonName) { if (currentPhase !== 1) return; phase1ButtonsClicked[buttonName] = true; const btn = document.getElementById(`btn-${buttonName}`); if (btn) { btn.disabled = true; btn.classList.add('clicked'); } else { console.error(`Button ${buttonName} not found`); return; } const allClicked = Object.values(phase1ButtonsClicked).every(val => val === true); if (allClicked) { if (currentMemberIndex < members.length) { const memberLetter = members[currentMemberIndex]; const checkbox = document.getElementById(`member${memberLetter}`); if (checkbox) checkbox.checked = true; currentMemberIndex++; handleCheckboxChange(); if (currentMemberIndex < members.length) { setTimeout(resetPhase1Buttons, 500); } else { currentPhase = 2; const p1 = document.getElementById('phase-1-buttons'); if(p1) p1.classList.add('hidden'); const p2 = document.getElementById('phase-2-buttons'); if(p2) p2.classList.remove('hidden'); const lbl = document.getElementById('controls-label'); if(lbl) lbl.textContent = "Membangun Ketua Tim"; } } } }
+        function resetPhase1Buttons() { phase1ButtonsClicked = { tanya: false, cerita: false, undang: false, jelaskan: false }; ['tanya', 'cerita', 'undang', 'jelaskan'].forEach(name => { const btn = document.getElementById(`btn-${name}`); if (btn) { btn.disabled = false; btn.classList.remove('clicked'); } }); }
+        function handlePhase2Click(buttonName) { if (currentPhase !== 2) return; phase2ButtonsClicked[buttonName] = true; const btn = document.getElementById(`btn-${buttonName}`); if (btn) { btn.disabled = true; btn.classList.add('clicked'); } else { return; } const allClicked = Object.values(phase2ButtonsClicked).every(val => val === true); if (allClicked) { if (currentBinaIndex < members.length) { const memberLetter = members[currentBinaIndex]; if (currentBinaIndex === 0) { simulationMode = 'duplicating_lv1'; renderControls(); } memberState[memberLetter].isLeader = true; memberState[memberLetter].duplicationLevels = 1; updateSimulation(); currentBinaIndex++; if (currentBinaIndex < members.length) { setTimeout(resetPhase2Buttons, 500); } else { currentPhase = 3; const p2 = document.getElementById('phase-2-buttons'); if(p2) p2.classList.add('hidden'); const p3 = document.getElementById('phase-3-buttons'); if(p3) p3.classList.remove('hidden'); } } } }
+        function resetPhase2Buttons() { phase2ButtonsClicked = { sapa: false, sharing: false, solusi: false, duplikasi: false }; ['sapa', 'sharing', 'solusi', 'duplikasi'].forEach(name => { const btn = document.getElementById(`btn-${name}`); if (btn) { btn.disabled = false; btn.classList.remove('clicked'); } }); }
+        function handlePhase3Click(buttonName) { if (currentPhase !== 3) return; phase3ButtonsClicked[buttonName] = true; const btnId = (buttonName === 'duplikasi') ? 'btn-duplikasi-level' : 'btn-edifikasi'; const btn = document.getElementById(btnId); if (btn) { btn.disabled = true; btn.classList.add('clicked'); } else { return; } const allClicked = Object.values(phase3ButtonsClicked).every(val => val === true); if (allClicked) { const { level, memberIndex } = currentDuplicationState; if (level > 4) return; const memberLetter = members[memberIndex]; memberState[memberLetter].duplicationLevels = level; updateSimulation(); let newMemberIndex = memberIndex + 1; let newLevel = level; if (newMemberIndex >= members.length) { newMemberIndex = 0; newLevel = level + 1; } currentDuplicationState = { level: newLevel, memberIndex: newMemberIndex }; if (newLevel <= 4) { setTimeout(resetPhase3Buttons, 500); } } }
+        function resetPhase3Buttons() { phase3ButtonsClicked = { edifikasi: false, duplikasi: false }; const btnEd = document.getElementById('btn-edifikasi'); if(btnEd) { btnEd.disabled = false; btnEd.classList.remove('clicked'); } const btnDup = document.getElementById('btn-duplikasi-level'); if(btnDup) { btnDup.disabled = false; btnDup.classList.remove('clicked'); } }
+        function goBackOneStep() { stopConfetti(); const championsAudio = document.getElementById('champions-audio'); if (championsAudio && !championsAudio.paused) championsAudio.pause(); if (currentPhase === 3) { let { level, memberIndex } = currentDuplicationState; let prevMemberIndex = memberIndex - 1; let prevLevel = level; if (prevMemberIndex < 0) { prevMemberIndex = 4; prevLevel = level - 1; } if (prevLevel < 2) { currentPhase = 2; currentBinaIndex = 5; const p3 = document.getElementById('phase-3-buttons'); if(p3) p3.classList.add('hidden'); const p2 = document.getElementById('phase-2-buttons'); if(p2) p2.classList.remove('hidden'); resetPhase2Buttons(); } else { const memberToRevert = members[prevMemberIndex]; memberState[memberToRevert].duplicationLevels = prevLevel - 1; currentDuplicationState = { level: prevLevel, memberIndex: prevMemberIndex }; resetPhase3Buttons(); } updateSimulation(); } else if (currentPhase === 2) { if (currentBinaIndex === 0) { currentPhase = 1; currentMemberIndex = 5; simulationMode = 'recruit_lv1'; const p2 = document.getElementById('phase-2-buttons'); if(p2) p2.classList.add('hidden'); const p1 = document.getElementById('phase-1-buttons'); if(p1) p1.classList.remove('hidden'); resetPhase1Buttons(); renderControls(); } else { currentBinaIndex--; const memberToRevert = members[currentBinaIndex]; memberState[memberToRevert].isLeader = false; memberState[memberToRevert].duplicationLevels = 0; resetPhase2Buttons(); updateSimulation(); } } else if (currentPhase === 1) { if (currentMemberIndex > 0) { currentMemberIndex--; const memberToUncheck = members[currentMemberIndex]; const cb = document.getElementById(`member${memberToUncheck}`); if(cb) cb.checked = false; resetPhase1Buttons(); handleCheckboxChange(); } } }
+        function initializeSimulator() { console.log("Initializing Simulator..."); stopConfetti(); const championsAudio = document.getElementById('champions-audio'); if (championsAudio && !championsAudio.paused) championsAudio.pause(); resetMemberState(); simulationMode = 'recruit_lv1'; phase1ButtonsClicked = { tanya: false, cerita: false, undang: false, jelaskan: false }; phase2ButtonsClicked = { sapa: false, sharing: false, solusi: false, duplikasi: false }; phase3ButtonsClicked = { edifikasi: false, duplikasi: false }; currentMemberIndex = 0; currentBinaIndex = 0; currentDuplicationState = { level: 2, memberIndex: 0 }; currentPhase = 1; const p1=document.getElementById('phase-1-buttons'); if(p1) p1.classList.remove('hidden'); const p2=document.getElementById('phase-2-buttons'); if(p2) p2.classList.add('hidden'); const p3=document.getElementById('phase-3-buttons'); if(p3) p3.classList.add('hidden'); resetPhase1Buttons(); resetPhase2Buttons(); resetPhase3Buttons(); renderControls(); members.forEach(letter => { const cb = document.getElementById(`member${letter}`); if (cb) cb.checked = false; }); handleCheckboxChange(); const lbl = document.getElementById('controls-label'); if(lbl) lbl.textContent = "Membangun Anggota Tim"; }
+        function switchTab(tabName) { console.log(`Tab switch requested to ${tabName}, but tab UI is removed.`); }
+        function handleCheckboxChange() { 
+            if (simulationMode === 'recruit_lv1') { 
+                anggotaLevels[0] = currentMemberIndex; 
+            } 
+            updateSimulation(); 
+        }
+       function renderControls() { 
+            const container = document.getElementById('controls-body'); if(!container) { console.error("controls-body not found!"); return; } 
+            let labelText = "Membangun Anggota Tim"; if (currentPhase > 1) labelText = "Membangun Ketua Tim";
+            let checkboxBaseStyle = "bg-slate-800 border-slate-700 text-slate-300"; let checkboxCheckedStyle = "peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-500";
+            if (simulationMode === 'duplicating_lv1') { labelText = "Membangun Ketua Tim"; checkboxBaseStyle = "bg-indigo-900/50 border-indigo-700 text-indigo-300"; checkboxCheckedStyle = "peer-checked:bg-amber-400 peer-checked:text-white peer-checked:border-amber-400"; }
+            let checkboxHTML = members.map(letter => `<div> <div id="kt-label-${letter}" class="text-center h-4 mb-2"></div> <input type="checkbox" id="member${letter}" class="hidden peer" disabled> <label for="member${letter}" class="block p-2 text-center rounded-lg border ${checkboxBaseStyle} ${checkboxCheckedStyle} font-bold transition text-sm opacity-80">${letter}</label> <div class="mt-1 space-y-1 flex flex-col items-center"> <div id="duplication-tree-${letter}" class="flex flex-col items-center space-y-1"></div> </div> </div>`).join('');
+            container.innerHTML = `<div class="flex justify-between items-center mb-2"> <label id="controls-label" class="block font-medium text-slate-400 text-sm">${labelText}</label> <button id="back-button" title="Kembali" class="text-slate-400 hover:text-amber-400 p-1 rounded-full transition-all" onclick="goBackOneStep()"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"> <path fill-rule="evenodd" d="M15 10a.75.75 0 0 1-.75.75H7.56l2.22 2.22a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 1.06L7.56 9.25H14.25A.75.75 0 0 1 15 10Z" clip-rule="evenodd" /> </svg> </button> </div> <div class="grid grid-cols-5 gap-1.5"> ${checkboxHTML} </div>`; 
+            Object.entries(memberState).forEach(([letter, member]) => { const cb = document.getElementById(`member${letter}`); if (cb) { if (currentPhase === 1) cb.checked = (members.indexOf(letter) < currentMemberIndex); else cb.checked = member.isLeader; } });
+            updateSimulation(); 
+        }
+        function renderDuplicationTree() { Object.entries(memberState).forEach(([letter, member]) => { const treeContainer = document.getElementById(`duplication-tree-${letter}`); if (treeContainer) { treeContainer.innerHTML = ''; if (member.isLeader) { for (let i = 1; i <= member.duplicationLevels; i++) { const numberValue = 5 ** i; const numberDiv = document.createElement('div'); numberDiv.className = "text-xs font-bold text-slate-400 bg-slate-700 px-2 py-0.5 rounded-md"; numberDiv.textContent = numberValue.toLocaleString('id-ID'); treeContainer.appendChild(numberDiv); } } } }); }
+        const confettiCanvas = document.getElementById('confetti-canvas'); const confettiCtx = confettiCanvas ? confettiCanvas.getContext('2d') : null; let confettiPieces = []; const confettiColors = ['#fde68a', '#facc15', '#eab308', '#d97706'];
+        function startConfetti() { if (confettiInterval || !confettiCanvas) return; confettiCanvas.style.display = 'block'; confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; confettiInterval = setInterval(() => { for (let i = 0; i < 20; i++) { createConfetti(); } }, 500); animateConfetti(); }
+        function stopConfetti() { if (!confettiInterval) return; clearInterval(confettiInterval); confettiInterval = null; cancelAnimationFrame(animationFrameId); animationFrameId = null; setTimeout(() => { if (confettiCanvas && confettiCtx) { confettiCanvas.style.display = 'none'; confettiPieces = []; confettiCtx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height); } }, 3000); }
+        function createConfetti() { if(confettiCanvas) confettiPieces.push({ x: Math.random() * confettiCanvas.width, y: -20, w: 5 + Math.random() * 10, h: 10 + Math.random() * 10, color: confettiColors[Math.floor(Math.random() * confettiColors.length)], rotation: Math.random() * 360, speedX: Math.random() * 4 - 2, speedY: 2 + Math.random() * 3, opacity: 1 }); }
+        function animateConfetti() { if (!confettiCtx || !confettiCanvas) return; animationFrameId = requestAnimationFrame(animateConfetti); confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); confettiPieces.forEach((piece, index) => { piece.y += piece.speedY; piece.x += piece.speedX; piece.rotation += piece.speedX; piece.opacity -= 0.005; if (piece.y > confettiCanvas.height || piece.opacity <= 0) { confettiPieces.splice(index, 1); } else { confettiCtx.save(); confettiCtx.translate(piece.x, piece.y); confettiCtx.rotate(piece.rotation * Math.PI / 180); confettiCtx.globalAlpha = piece.opacity; confettiCtx.fillStyle = piece.color; confettiCtx.fillRect(-piece.w / 2, -piece.h / 2, piece.w, piece.h); confettiCtx.restore(); } }); }
+        
+        function updateSimulation() { 
+             if (simulationMode === 'duplicating_lv1') { anggotaLevels[0] = 5; anggotaLevels.fill(0, 1); Object.values(memberState).forEach(member => { if (member.isLeader) { if (member.duplicationLevels >= 1) anggotaLevels[1] += 5; if (member.duplicationLevels >= 2) anggotaLevels[2] += 25; if (member.duplicationLevels >= 3) anggotaLevels[3] += 125; if (member.duplicationLevels >= 4) anggotaLevels[4] += 625; } }); } 
+             else { anggotaLevels[0] = currentMemberIndex; anggotaLevels.fill(0, 1); } 
+            const totalAnggotaTim = anggotaLevels.reduce((a, b) => a + b, 0); const totalAnggota = totalAnggotaTim + 1; const depositAwal = 100; const bonusReveralLv1 = anggotaLevels[0] * (0.05 * 100); const bonusReveralLv2 = anggotaLevels[1] * (0.02 * 100); const bonusTim = anggotaLevels[0] >= 5 ? 20 : 0; let cumulativeBonusPeringkat = 0; if (anggotaLevels[0] >= 5) cumulativeBonusPeringkat += 50; if (totalAnggota >= 31) cumulativeBonusPeringkat += 100; if (totalAnggota >= 101) cumulativeBonusPeringkat += 200; if (totalAnggota >= 201) cumulativeBonusPeringkat += 400; if (totalAnggota >= 351) cumulativeBonusPeringkat += 600; if (totalAnggota >= 501) cumulativeBonusPeringkat += 1000; if (totalAnggota >= 901) cumulativeBonusPeringkat += 2000; if (totalAnggota >= 1601) cumulativeBonusPeringkat += 3000; if (totalAnggota >= 3501) cumulativeBonusPeringkat += 5000;
+            let status = "Anggota", statusColor = "bg-yellow-400/20 text-yellow-300", bonusPeringkatForDisplay = 0; const previousStatus = document.getElementById('kpiStatus')?.textContent.trim(); // Ambil status sebelumnya
+            if (totalAnggota >= 3501) { status = "VIP 9"; statusColor = "bg-violet-400/20 text-violet-300"; bonusPeringkatForDisplay = 5000;} else if (totalAnggota >= 1601) { status = "VIP 8"; statusColor = "bg-violet-400/20 text-violet-300"; bonusPeringkatForDisplay = 3000;} else if (totalAnggota >= 901) { status = "VIP 7"; statusColor = "bg-indigo-400/20 text-indigo-300"; bonusPeringkatForDisplay = 2000;} else if (totalAnggota >= 501) { status = "VIP 6"; statusColor = "bg-indigo-400/20 text-indigo-300"; bonusPeringkatForDisplay = 1000;} else if (totalAnggota >= 351) { status = "VIP 5"; statusColor = "bg-blue-400/20 text-blue-300"; bonusPeringkatForDisplay = 600;} else if (totalAnggota >= 201) { status = "VIP 4"; statusColor = "bg-blue-400/20 text-blue-300"; bonusPeringkatForDisplay = 400;} else if (totalAnggota >= 101) { status = "VIP 3"; statusColor = "bg-cyan-400/20 text-cyan-300"; bonusPeringkatForDisplay = 200;} else if (totalAnggota >= 31) { status = "VIP 2"; statusColor = "bg-cyan-400/20 text-cyan-300"; bonusPeringkatForDisplay = 100;} else if (anggotaLevels[0] >= 5) { status = "VIP 1"; statusColor = "bg-emerald-400/20 text-emerald-300"; bonusPeringkatForDisplay = 50;}
+            const totalBonus = bonusReveralLv1 + bonusReveralLv2 + bonusTim + cumulativeBonusPeringkat; const saldoAkun = depositAwal + totalBonus; 
+            const leadersInLv1 = Math.floor(anggotaLevels[1] / 5);
+            
+            let batasanModal; const limit_L0=30; const limit_L1=450; const limit_L2=2550; const limit_L3=13050; const limit_L4=65550;
+            if (simulationMode === 'recruit_lv1') { 
+                batasanModal = 300 + (anggotaLevels[0] * limit_L0); 
+            } 
+            else { 
+                let totalContribution = 0; 
+                Object.values(memberState).forEach(member => { 
+                    if (member.duplicationLevels === 4) totalContribution += limit_L4; 
+                    else if (member.duplicationLevels === 3) totalContribution += limit_L3; 
+                    else if (member.duplicationLevels === 2) totalContribution += limit_L2; 
+                    else if (member.duplicationLevels === 1) totalContribution += limit_L1;
+                    else {
+                        totalContribution += limit_L0;
+                    }
+                }); 
+                batasanModal = 300 + totalContribution; 
+            }
+
+            // --- PERBAIKAN LOGIKA SINYAL KE-3 (FINAL) DIMULAI DI SINI ---
+            let sinyalKe3 = "Tidak Aktif"; // Default adalah Tidak Aktif
+            
+            const isALeader = memberState.A.isLeader;
+            const isBLeader = memberState.B.isLeader;
+            const isCLeader = memberState.C.isLeader;
+            const isDLeader = memberState.D.isLeader;
+            const isELeader = memberState.E.isLeader;
+            const andaIsVip1 = (anggotaLevels[0] >= 5);
+
+            if (andaIsVip1) {
+                // Cek dari prioritas TERTINGGI ke TERENDAH
+                
+                // Aturan #4 (Tertinggi): A, B, C, D, E -> Permanen
+                if (isALeader && isBLeader && isCLeader && isDLeader && isELeader) {
+                    sinyalKe3 = "Permanen";
+                } 
+                // Aturan #5 (Prioritas Tinggi): B + D -> Tidak Aktif
+                // Ini akan menangani B+D dan juga A+B+C+D
+                else if (isBLeader && isDLeader) {
+                    sinyalKe3 = "Tidak Aktif"; 
+                } 
+                // Aturan #3: A, B, C -> 20 Hari
+                else if (isALeader && isBLeader && isCLeader) {
+                    sinyalKe3 = "20 Hari";
+                }
+                // Aturan #1 & #2 (Prioritas Terendah dan sangat spesifik)
+                // Hanya "Anda" SAJA, atau "Anda + A" SAJA.
+                else if (
+                    (!isALeader && !isBLeader && !isCLeader && !isDLeader && !isELeader) || // Hanya Anda
+                    (isALeader  && !isBLeader && !isCLeader && !isDLeader && !isELeader)    // Hanya Anda + A
+                ) {
+                    sinyalKe3 = "5 Hari";
+                }
+                // KASUS LAINNYA: (seperti A+B, A+C, B+C, dll)
+                // Akan tetap "Tidak Aktif" sesuai default.
+            }
+            // --- PERBAIKAN LOGIKA SINYAL KE-3 BERAKHIR DI SINI ---
+
+            let sinyalKe4 = "Belum Aktif"; if (anggotaLevels[1] > 0) { sinyalKe4 = "10 Hari"; } let bonusVolume = "0%"; if (anggotaLevels[0] >= 5) { if (totalAnggota >= 3501) bonusVolume = "5%"; else if (totalAnggota >= 1601) bonusVolume = "3.5%"; else if (totalAnggota >= 901) bonusVolume = "3%"; else if (totalAnggota >= 501) bonusVolume = "2.5%"; else if (totalAnggota >= 351) bonusVolume = "2%"; else if (totalAnggota >= 201) bonusVolume = "1.5%"; else if (totalAnggota >= 101) bonusVolume = "1%"; else if (totalAnggota >= 31) bonusVolume = "0.5%"; else if (totalAnggota >= 5) bonusVolume = "0.3%"; }
+            
+            const isVip9 = status === "VIP 9"; 
+            const juaraMsg = document.getElementById('juara-message-container'); 
+            const fokusMsg = document.getElementById('fokus-message'); 
+            const championsAudio = document.getElementById('champions-audio');
+            
+            if (isVip9) { 
+                startConfetti(); 
+                if(juaraMsg) juaraMsg.classList.remove('hidden'); 
+                if(fokusMsg) fokusMsg.classList.add('hidden'); 
+                // Logic audio Champions (2).mp3
+                if (championsAudio && championsAudio.paused) {
+                    championsAudio.currentTime = 0; // Mulai dari awal
+                    championsAudio.loop = true; // Opsional: putar berulang
+                    championsAudio.play().catch(e => {console.error("Champions Audio play failed:", e)});
+                }
+            } else { 
+                stopConfetti(); 
+                if(juaraMsg) juaraMsg.classList.add('hidden'); 
+                if(fokusMsg) fokusMsg.classList.remove('hidden'); 
+                // Stop audio Champions (2).mp3
+                if (championsAudio && !championsAudio.paused) {
+                    championsAudio.pause();
+                    championsAudio.currentTime = 0;
+                }
+            }
+            
+            const andaLbl = document.getElementById('anda-label'); const ktLbl = document.getElementById('ketua-tim-label'); const crownIcn = document.getElementById('crown-icon'); if (anggotaLevels[0] >= 5) { if(andaLbl){andaLbl.classList.remove('bg-blue-200','text-blue-800','bg-indigo-100','text-indigo-800'); andaLbl.classList.add('bg-amber-400/20','text-amber-300');} if(ktLbl) ktLbl.innerHTML = `<span class="text-xs font-bold text-emerald-400">Ketua Tim</span>`; if(crownIcn) crownIcn.classList.remove('hidden'); } else { if(andaLbl){andaLbl.classList.remove('bg-amber-400/20','text-amber-300'); andaLbl.classList.add('bg-blue-200','text-blue-800');} if(ktLbl) ktLbl.innerHTML = ''; if(crownIcn) crownIcn.classList.add('hidden'); } 
+             if (simulationMode === 'duplicating_lv1') { Object.entries(memberState).forEach(([letter, member]) => { const label = document.getElementById(`kt-label-${letter}`); const cb = document.getElementById(`member${letter}`); if(cb) cb.checked = member.isLeader; if(label) label.innerHTML = member.isLeader ? `<span class="text-base">👑</span>` : ''; }); }
+            renderDuplicationTree(); const elTotalBonus=document.getElementById('kpiTotalBonus'); if(elTotalBonus) elTotalBonus.textContent=`+${totalBonus.toLocaleString('id-ID')} USDT`; const elKpiStatus=document.getElementById('kpiStatus'); if(elKpiStatus) elKpiStatus.innerHTML=`<span class="px-2 py-1 rounded-full font-bold text-xs ${statusColor}">${status}</span>`; const elBonusPeringkat=document.getElementById('kpiBonusPeringkat'); if(elBonusPeringkat) elBonusPeringkat.textContent=bonusPeringkatForDisplay>0?`+${bonusPeringkatForDisplay.toLocaleString('id-ID')} USDT`:''; const elBonusVol=document.getElementById('resBonusVolume'); if(elBonusVol) elBonusVol.textContent=bonusVolume; const elSaldo=document.getElementById('resModalAwalPanel'); if(elSaldo) elSaldo.textContent=`${saldoAkun.toLocaleString('id-ID')} USDT`; const elRef1=document.getElementById('resBonusReveral1'); if(elRef1) elRef1.textContent=`+ ${bonusReveralLv1.toLocaleString('id-ID')} USDT`; const elRef2=document.getElementById('resBonusReveral2'); if(elRef2) elRef2.textContent=`+ ${bonusReveralLv2.toLocaleString('id-ID')} USDT`; const elBonusTim=document.getElementById('resBonusTim'); if(elBonusTim) elBonusTim.textContent=`+ ${bonusTim.toLocaleString('id-ID')} USDT`; const elBatas=document.getElementById('resBatasanModal'); if(elBatas) elBatas.textContent=`${batasanModal.toLocaleString('id-ID')} USDT`; const elTotalAnggota=document.getElementById('resTotalAnggotaPanel'); if(elTotalAnggota) elTotalAnggota.textContent=`${totalAnggotaTim.toLocaleString('id-ID')} Anggota`; 
+            const check = `<svg class="inline-block h-4 w-4 mr-1 text-emerald-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>`; const cross = `<svg class="inline-block h-4 w-4 mr-1 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>`;
+            const sinyalSSM = `<div class="text-xs text-emerald-400 font-semibold flex items-center pt-1 whitespace-nowrap"><span class="flex items-center">${check}<span>Sinyal Siang & Malam</span></span></div>`; const sinyal3 = `<div class="text-xs ${sinyalKe3 !== 'Tidak Aktif' ? 'text-emerald-400' : 'text-slate-500'} font-semibold flex items-center pt-1 whitespace-nowrap"> <span class="flex items-center"> ${sinyalKe3 !== 'Tidak Aktif' ? check : cross} <span>Sinyal ke-3: ${sinyalKe3}</span> </span> </div>`; const sinyal4 = `<div class="text-xs ${sinyalKe4 !== 'Belum Aktif' ? 'text-emerald-400' : 'text-slate-500'} font-semibold flex items-center pt-1 whitespace-nowrap"> <span class="flex items-center"> ${sinyalKe4 !== 'Belum Aktif' ? check : cross} <span>Sinyal ke-4: ${sinyalKe4}</span> </span> </div>`; const sinyalContainer = document.getElementById('sinyalContainer'); if (sinyalContainer) sinyalContainer.innerHTML = sinyalSSM + sinyal3 + sinyal4;
+            const oldSsm = document.getElementById('resSinyalSSM_OLD'); if (oldSsm) oldSsm.innerHTML = ''; const oldS3 = document.getElementById('resSinyal3Panel_OLD'); if(oldS3) oldS3.innerHTML = '';
+            function pulseElement(id) { const el = document.getElementById(id); if (el) { el.classList.add('number-pulse'); setTimeout(() => { el.classList.remove('number-pulse'); }, 400); } }
+            pulseElement('kpiTotalBonus'); pulseElement('resModalAwalPanel');
+        }
+
+        // --- Event Listener DOMContentLoaded (Setup Awal) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const enterButton = document.getElementById('enter-button');
+            const splashScreen = document.getElementById('splash-screen');
+            const dashboardContent = document.getElementById('dashboard-content');
+            
+            if (enterButton && splashScreen && dashboardContent) { 
+                enterButton.addEventListener('click', () => {
+                    console.log("Enter button clicked!"); 
+                    const elem = document.documentElement;
+                    if (elem.requestFullscreen) elem.requestFullscreen().catch(err => { console.error("Fullscreen error:", err); }); 
+                    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                    
+                    splashScreen.style.animation = 'fadeOut 0.5s ease-out forwards'; 
+                    setTimeout(() => {
+                        splashScreen.style.display = 'none';
+                        dashboardContent.style.display = 'block'; 
+                        dashboardContent.style.animation = 'fadeIn 0.5s ease-out forwards'; 
+                        document.body.style.overflow = 'auto';
+                        if (typeof initializeSimulator === 'function') {
+                             initializeSimulator(); 
+                        } else {
+                             console.error("InitializeSimulator function not found!");
+                        }
+                    }, 500);
+                });
+            } else {
+                 console.error("Initial elements (enterButton, splashScreen, or dashboardContent) not found!");
+                 if (!splashScreen && dashboardContent) {
+                      dashboardContent.style.display = 'block'; 
+                      document.body.style.overflow = 'auto'; 
+                      if (typeof initializeSimulator === 'function') initializeSimulator();
+                 }
+            }
+            
+            // Service Worker & Audio Setup
+            if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/BenefitPlan/sw.js').then(reg => {console.log('SW registered:', reg)}, err => {console.log('SW registration failed:', err)}); }); }
+            const audioButton = document.getElementById('play-audio-button'); const audio = document.getElementById('tutorial-audio');
+            const speakerIcon = document.getElementById('speaker-icon'); const speakerOffIcon = document.getElementById('speaker-off-icon');
+            if (audioButton && audio && speakerIcon && speakerOffIcon) { 
+                audioButton.addEventListener('click', () => { 
+                    const championsAudio = document.getElementById('champions-audio');
+                    if (championsAudio && !championsAudio.paused) {
+                        // Jika audio Champions sedang diputar, hentikan dulu
+                        championsAudio.pause();
+                        championsAudio.currentTime = 0;
+                    }
+                    if (audio.paused) audio.play().catch(e => {console.error("Audio play failed:", e)}); 
+                    else audio.pause(); 
+                });
+                audio.onplay = () => { speakerIcon.classList.add('hidden'); speakerOffIcon.classList.remove('hidden'); };
+                audio.onpause = () => { speakerIcon.classList.remove('hidden'); speakerOffIcon.classList.add('hidden'); };
+                if (audio.paused) { speakerIcon.classList.remove('hidden'); speakerOffIcon.classList.add('hidden'); } else { speakerIcon.classList.add('hidden'); speakerOffIcon.classList.remove('hidden'); }
+            }
+        });
+       
+    </script>
+</body>
+</html>

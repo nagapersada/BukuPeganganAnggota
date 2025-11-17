@@ -1,0 +1,22 @@
+{
+  "name": "Benefit",
+  "short_name": "Benefit",
+  "description": "Alat bantu visual untuk merencanakan strategi dan memaksimalkan potensi pertumbuhan tim Anda.",
+  "start_url": "/BenefitPlan/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/BenefitPlan/images/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/BenefitPlan/images/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
