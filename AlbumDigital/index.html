@@ -1,44 +1,59 @@
 <!DOCTYPE html>
 <html lang="id">
-<!-- PERBAIKAN TAMPILAN LANDSCAPE (BUKU DIGITAL) -->
+<!-- PERBAIKAN LANDSCAPE V2 (PAKSA MUNCUL) -->
 <style>
+    /* CSS ini hanya aktif saat HP miring */
     @media (orientation: landscape) {
-        /* 1. Paksa Body memenuhi layar */
+        
+        /* 1. Reset Total Body: Izinkan Scroll */
         html, body {
-            width: 100% !important;
-            height: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background-color: #111827 !important; /* Sesuaikan warna background jika perlu */
-            overflow-y: auto !important; /* Izinkan scroll */
-        }
-
-        /* 2. Paksa Kontainer Utama Melebar */
-        /* Kita target div umum karena saya tidak tahu nama class pastinya */
-        body > div, .container, .wrapper, #app {
-            max-width: 100% !important;
-            width: 100% !important;
             height: auto !important;
-            margin: 0 !important;
-            border-radius: 0 !important; /* Hapus sudut bulat jika ada */
-            box-shadow: none !important; /* Hapus bayangan kotak */
-            position: static !important; /* Reset posisi */
-        }
-
-        /* 3. Perbaiki Gambar/Cover Buku agar tidak kekecilan/kebesaran */
-        img {
-            max-width: 50% !important; /* Agar gambar tidak menuhin satu layar penuh */
-            height: auto !important;
-            margin: 0 auto !important;
+            min-height: 100vh !important;
+            overflow-y: scroll !important; /* Paksa scrollbar muncul */
+            position: static !important;
             display: block !important;
         }
+
+        /* 2. MATIKAN POSISI ABSOLUTE/FIXED */
+        /* Ini biang kerok konten hilang/terpotong */
+        body > div, .container, .wrapper, #app, .book-container, section {
+            position: relative !important; /* Jangan absolute */
+            top: auto !important;
+            left: auto !important;
+            transform: none !important; /* Hapus efek centering */
+            margin: 0 auto !important;
+            height: auto !important;
+            width: 100% !important;
+            display: block !important;
+            visibility: visible !important; /* Paksa terlihat */
+            opacity: 1 !important;
+        }
+
+        /* 3. ATUR GAMBAR/BUKU */
+        img, canvas, .page {
+            display: block !important;
+            margin: 20px auto !important; /* Beri jarak atas bawah */
+            max-width: 60% !important; /* Jangan terlalu lebar, biar enak dilihat */
+            height: auto !important; /* Tinggi menyesuaikan */
+            position: static !important;
+        }
+
+        /* 4. JUDUL & TOMBOL */
+        h1, h2, .title {
+            text-align: center !important;
+            margin-top: 20px !important;
+            position: relative !important;
+        }
         
-        /* 4. Pastikan tombol Masuk mudah diakses */
         button, .btn {
-            margin-bottom: 20px !important;
+            position: relative !important;
+            display: block !important;
+            margin: 20px auto !important; /* Tombol di tengah */
+            bottom: auto !important;
         }
     }
 </style>
+
 
 
 <head>
