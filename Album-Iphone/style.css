@@ -1,0 +1,256 @@
+/* Reset & Basic Setup */
+:root {
+    --primary-color: #8A2BE2; /* Ungu (BlueViolet) */
+    --primary-hover: #6a1eae;
+    --dark-bg: #121212;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-hover: rgba(255, 255, 255, 0.1);
+    --text-primary: #FFFFFF;
+    --text-secondary: #b3b3b3;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--text-primary);
+    overflow: hidden; /* Mencegah scrolling antar slide */
+    height: 100%;
+    width: 100%;
+}
+
+/* Slide Management */
+.slide {
+    display: none; /* Sembunyi secara default */
+    width: 100vw;
+    height: 100vh;
+    padding: 25px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide.active {
+    display: flex; /* Tampilkan slide yang aktif */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Slide 1: Home */
+#slide1 .container {
+    text-align: center;
+    max-width: 600px;
+}
+
+.team-logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 25px;
+}
+
+#slide1 h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+#slide1 p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+button {
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+    border: none;
+    padding: 15px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 50px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+/* Slide 2: Playlist */
+#slide2 {
+    background-image: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.85)), url('images/1000171790.jpg');
+    background-size: cover;
+    background-position: center;
+    justify-content: flex-start;
+}
+
+#backBtn {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 10px 20px;
+    font-size: 0.9rem;
+}
+
+.playlist-container {
+    width: 100%;
+    max-width: 700px;
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#audioPlayer {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+#nowPlaying {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* STYLE TOMBOL LIRIK */
+#showLyricsBtn {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+#showLyricsBtn:hover {
+    background-color: #555;
+}
+
+
+#playlist {
+    list-style: none;
+    width: 100%;
+    max-height: calc(100vh - 310px); /* Disesuaikan agar tombol lirik pas */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+#playlist li {
+    background-color: var(--card-bg);
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    border-left: 5px solid transparent;
+}
+
+#playlist li:hover {
+    background-color: var(--card-hover);
+}
+
+#playlist li.active {
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+    border-left: 5px solid #FFFFFF;
+}
+
+/* --- STYLE BARU UNTUK JENDELA LIRIK YANG ELEGAN --- */
+.hidden {
+    display: none !important;
+}
+
+/* Latar belakang gelap semi-transparan */
+#lyricsOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Latar belakang lebih gelap */
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* "Kartu" atau modal untuk lirik */
+.lyrics-modal {
+    background-color: #1e1e1e; /* Warna dasar modal */
+    border: 1px solid var(--primary-color);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    height: 75vh; /* 75% dari tinggi layar */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
+}
+
+/* Tombol tutup 'X' yang presisi dan elegan */
+#closeLyricsBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 50%;
+    width: 30px; /* Lebih kecil dan presisi */
+    height: 30px;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 30px; /* Menengahkan 'X' secara vertikal */
+    text-align: center;
+    z-index: 1001;
+    border: 1px solid #555;
+}
+#closeLyricsBtn:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.1);
+}
+
+/* Judul Lagu di dalam modal */
+#lyricsTitle {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 20px;
+    padding-top: 45px; /* Memberi ruang dari tombol tutup */
+    border-bottom: 1px solid #333;
+}
+
+/* Konten Lirik */
+#lyricsContent {
+    width: 100%;
+    height: 100%; /* Otomatis mengisi sisa ruang */
+    color: #ddd; /* Sedikit lebih lembut dari putih murni */
+    font-size: 1.1rem;
+    line-height: 1.8;
+    text-align: left; /* Teks lirik rata kiri lebih mudah dibaca */
+    overflow-y: auto;
+    white-space: pre-wrap; /* Penting agar baris baru (\n) berfungsi */
+    padding: 20px;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DVNP Motivation</title>
+    
+    <meta name="theme-color" content="#8A2BE2"/>
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="slide1" class="slide active">
+        <div class="container">
+            <img src="images/1000173031.jpg" alt="Logo Tim DV Naga Persada" class="team-logo">
+            <h1>Api Motivasi Sang Juara</h1>
+            <p>Selamat datang, Pejuang! Dengarkan inspirasi dan motivasi dari setiap lagu ini untuk menempa dan membentuk <strong>mental juara</strong> Anda.</p>
+            <div class="button-group">
+                <button id="enterBtn">Masuk ke Playlist</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="slide2" class="slide">
+        <button id="backBtn">&larr; Kembali</button>
+        <div class="playlist-container">
+            <audio id="audioPlayer" controls></audio>
+            <div id="nowPlaying">Pilih lagu untuk diputar...</div>
+            
+            <button id="showLyricsBtn">Tampilkan Lirik</button>
+            
+            <ul id="playlist">
+                </ul>
+        </div>
+    </div>
+
+    <div id="lyricsOverlay" class="hidden">
+        <div class="lyrics-modal">
+            <button id="closeLyricsBtn">&times;</button>
+            <h2 id="lyricsTitle">Judul Lagu</h2> <div id="lyricsContent">
+                </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Registrasi Service Worker untuk PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('Service Worker terdaftar:', registration);
+                })
+                .catch(error => {
+                    console.log('Registrasi Service Worker gagal:', error);
+                });
+        }
+    </script>
+</body>
+</html>
