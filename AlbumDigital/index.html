@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html lang="id">
-    <!-- TAMBAHKAN INI DI DALAM FOLDER APLIKASI YANG MACET (misal: Gaskeun/index.html) -->
+<!-- PERBAIKAN TAMPILAN LANDSCAPE (BUKU DIGITAL) -->
 <style>
-    /* PERBAIKAN KHUSUS LANDSCAPE (MIRING) */
     @media (orientation: landscape) {
-        /* 1. Paksa agar bisa di-scroll */
+        /* 1. Paksa Body memenuhi layar */
         html, body {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #111827 !important; /* Sesuaikan warna background jika perlu */
+            overflow-y: auto !important; /* Izinkan scroll */
+        }
+
+        /* 2. Paksa Kontainer Utama Melebar */
+        /* Kita target div umum karena saya tidak tahu nama class pastinya */
+        body > div, .container, .wrapper, #app {
+            max-width: 100% !important;
+            width: 100% !important;
             height: auto !important;
-            min-height: 100vh !important;
-            overflow-y: auto !important;
-            position: static !important;
+            margin: 0 !important;
+            border-radius: 0 !important; /* Hapus sudut bulat jika ada */
+            box-shadow: none !important; /* Hapus bayangan kotak */
+            position: static !important; /* Reset posisi */
         }
 
-        /* 2. Kecilkan logo/gambar agar tidak menuhin layar */
-        img, .logo {
-            max-height: 120px !important;
-            width: auto !important;
-            margin-top: 10px !important;
-            margin-bottom: 10px !important;
-        }
-
-        /* 3. Kecilkan judul */
-        h1, h2, .title {
-            font-size: 1.2rem !important;
-            margin-bottom: 0.5rem !important;
-        }
-
-        /* 4. Pastikan konten padding aman */
-        .container, .wrapper, section {
-            padding-bottom: 50px !important;
+        /* 3. Perbaiki Gambar/Cover Buku agar tidak kekecilan/kebesaran */
+        img {
+            max-width: 50% !important; /* Agar gambar tidak menuhin satu layar penuh */
             height: auto !important;
+            margin: 0 auto !important;
+            display: block !important;
+        }
+        
+        /* 4. Pastikan tombol Masuk mudah diakses */
+        button, .btn {
+            margin-bottom: 20px !important;
         }
     }
 </style>
+
 
 <head>
     <meta charset="UTF-8">
