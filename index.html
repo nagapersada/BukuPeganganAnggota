@@ -1,59 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
-    <!-- PERBAIKAN LANDSCAPE V2 (PAKSA MUNCUL) -->
-<style>
-    /* CSS ini hanya aktif saat HP miring */
-    @media (orientation: landscape) {
-        
-        /* 1. Reset Total Body: Izinkan Scroll */
-        html, body {
-            height: auto !important;
-            min-height: 100vh !important;
-            overflow-y: scroll !important; /* Paksa scrollbar muncul */
-            position: static !important;
-            display: block !important;
-        }
-
-        /* 2. MATIKAN POSISI ABSOLUTE/FIXED */
-        /* Ini biang kerok konten hilang/terpotong */
-        body > div, .container, .wrapper, #app, .book-container, section {
-            position: relative !important; /* Jangan absolute */
-            top: auto !important;
-            left: auto !important;
-            transform: none !important; /* Hapus efek centering */
-            margin: 0 auto !important;
-            height: auto !important;
-            width: 100% !important;
-            display: block !important;
-            visibility: visible !important; /* Paksa terlihat */
-            opacity: 1 !important;
-        }
-
-        /* 3. ATUR GAMBAR/BUKU */
-        img, canvas, .page {
-            display: block !important;
-            margin: 20px auto !important; /* Beri jarak atas bawah */
-            max-width: 60% !important; /* Jangan terlalu lebar, biar enak dilihat */
-            height: auto !important; /* Tinggi menyesuaikan */
-            position: static !important;
-        }
-
-        /* 4. JUDUL & TOMBOL */
-        h1, h2, .title {
-            text-align: center !important;
-            margin-top: 20px !important;
-            position: relative !important;
-        }
-        
-        button, .btn {
-            position: relative !important;
-            display: block !important;
-            margin: 20px auto !important; /* Tombol di tengah */
-            bottom: auto !important;
-        }
-    }
-</style>
-
+    
 <head>
     <meta charset="UTF-8">
     <!-- Viewport optimal untuk iPhone/Android Poni & Rotasi -->
