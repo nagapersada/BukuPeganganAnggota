@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edukasi DNA Naga Persada</title>
+    <meta name="description" content="Audio Edukasi dan Transkrip DNA Tim Divi Naga Persada oleh Deka Sonjaya.">
+    <meta name="keywords" content="DVTEAM, OPALP, Divi Naga Persada, Deka Sonjaya, Edukasi, Motivasi">
+    <meta name="author" content="Deka Sonjaya">
+
+    <link rel="icon" href="DVlogo.png" type="image/png">
+    
+    <style>
+        :root {
+            --primary-color: #0a0a23;
+            --secondary-color: #f5f5f5;
+            --accent-color: #d4af37; /* Emas */
+            --text-color: #e0e0e0;
+            --bg-color: #1b1b32;
+            --highlight-bg: #3b3b4f;
+        }
+
+        /* PERUBAHAN KECIL: Memastikan 100% tinggi */
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* --- GAYA UNTUK SLIDE 1 (PEMBUKA) --- */
+        #slide1 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%; /* Diubah dari vh ke % agar konsisten */
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: var(--bg-color);
+        }
+
+        #slide1 img {
+            max-width: 150px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-color);
+            margin-bottom: 25px;
+        }
+
+        #slide1 p {
+            color: var(--accent-color);
+            font-size: 1.3em;
+            font-style: italic;
+            margin: 0 0 30px 0;
+            max-width: 600px;
+        }
+
+        #masukButton {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #masukButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* --- GAYA UNTUK SLIDE 2 (MATERI UTAMA) --- */
+        #slide2 {
+            display: none; /* Disembunyikan awalnya */
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: var(--primary-color); /* Latar belakang saat fullscreen */
+        }
+        
+        /* Saat fullscreen, pastikan body tidak punya padding */
+        :fullscreen #slide2 {
+            padding: 0;
+        }
+        
+        /* GAYA PLAYER (TIDAK DIUBAH) */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid var(--highlight-bg);
+        }
+
+        /* Style khusus saat fullscreen */
+        :fullscreen .container {
+            max-width: 100%;
+            height: 100%;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
+            margin-top: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--highlight-bg);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        header img {
+            max-width: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 2em;
+            font-weight: 700;
+        }
+         header p {
+            font-style: italic;
+            color: var(--secondary-color);
+            margin: 5px 0 0 0;
+        }
+
+        #audioPlayer {
+            width: 100%;
+            border-radius: 0;
+            margin-top: 20px;
+        }
+        
+        :fullscreen #audioPlayer {
+             margin-top: 0;
+        }
+
+        audio {
+            filter: sepia(20%) saturate(70%) grayscale(1) contrast(99%) invert(98%);
+        }
+
+        #transkripContainer {
+            padding: 25px;
+            max-height: 500px;
+            overflow-y: auto;
+            text-align: left;
+        }
+        
+        /* Atur tinggi transkrip saat fullscreen agar tidak meluap */
+        :fullscreen #transkripContainer {
+            max-height: calc(100vh - 270px); /* 100% tinggi dikurangi header, audio, footer */
+        }
+
+        .transkrip-item {
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            border-left: 5px solid var(--highlight-bg);
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .transkrip-item:hover {
+            background-color: var(--highlight-bg);
+        }
+
+        .transkrip-item.active {
+            background-color: var(--highlight-bg);
+            border-left: 5px solid var(--accent-color);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .transkrip-item strong {
+            color: var(--accent-color);
+            font-size: 1.1em;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--primary-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--highlight-bg);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9em;
+            color: #888;
+            background-color: var(--highlight-bg);
+            margin-top: 20px;
+        }
+        
+        :fullscreen footer {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="slide1">
+        <img src="DVlogo.png" alt="Logo DVTEAM">
+        <p>"Kesuksesan besar bukanlah keajaiban, melainkan hasil dari melakukan hal-hal kecil yang benar, secara konsisten dan bersama-sama."</p>
+        <button id="masukButton">Masuk Materi Utama</button>
+    </div>
+
+    <div id="slide2">
+        <div class="container">
+            <header>
+                <img src="DVlogo.png" alt="Logo DVTEAM">
+                <h1>DNA Naga Persada</h1>
+                <p>Oleh: Deka Sonjaya</p>
+            </header>
+
+            <audio id="audioPlayer" controls preload="metadata">
+                <source src="pelDNAnaga.mp3" type="audio/mpeg">
+                Browser Anda tidak mendukung elemen audio.
+            </audio>
+
+            <div id="transkripContainer">
+                </div>
+        </div>
+        
+        <footer>
+            &copy; 2025 - DVTEAM Naga Persada
+        </footer>
+    </div>
+
+    <script>
+        // --- SCRIPT PLAYER AUDIO (TIDAK DIUBAH) ---
+        const transkrip = [
+            { time: 0, title: "Pembuka" },
+            { time: 70, title: "Sesi 1: Fondasi Pola Pikir" },
+            { time: 229, title: "Sesi 2: Alur Percakapan Naga" },
+            { time: 457, title: "Tahap Konsultasi & Closing" },
+            { time: 540, title: "Penanganan Masalah (Diagnostik)" },
+            { time: 688, title: "Sesi 3: Dari Anggota Baru Menjadi Ketua Tim" },
+            { time: 735, title: "Kesimpulan dan Tiga Poin Utama" },
+            { time: 892, title: "Penutup Akhir" }
+        ];
+        
+        const audioPlayer = document.getElementById('audioPlayer');
+        const transkripContainer = document.getElementById('transkripContainer');
+        let transkripItems = [];
+
+        function createTranskripElements() {
+            transkrip.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.classList.add('transkrip-item');
+                div.dataset.time = item.time;
+                div.dataset.index = index;
+                const title = document.createElement('strong');
+                title.textContent = item.title;
+                div.appendChild(title); 
+                transkripContainer.appendChild(div);
+                transkripItems.push(div);
+            });
+        }
+
+        function highlightTranskrip(currentTime) {
+            let activeIndex = -1;
+            for (let i = transkrip.length - 1; i >= 0; i--) {
+                if (currentTime >= transkrip[i].time) {
+                    activeIndex = i;
+                    break;
+                }
+            }
+            transkripItems.forEach((item, index) => {
+                if (index === activeIndex) {
+                    if (!item.classList.contains('active')) {
+                        item.classList.add('active');
+                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            highlightTranskrip(audioPlayer.currentTime);
+        });
+
+        transkripContainer.addEventListener('click', (e) => {
+            const item = e.target.closest('.transkrip-item');
+            if (item) {
+                const time = parseFloat(item.dataset.time);
+                audioPlayer.currentTime = time;
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                }
+            }
+        });
+
+        createTranskripElements();
+        if (transkripItems.length > 0) {
+            transkripItems[0].classList.add('active');
+        }
+
+        // --- SCRIPT BARU UNTUK FUNGSI SLIDE & FULLSCREEN ---
+        
+        // Fungsi untuk meminta fullscreen (bekerja di Android/Desktop, tidak di iPhone)
+        function requestFullscreen() {
+            const elem = document.documentElement; // Targetkan seluruh halaman
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { // Safari (iPad) / Chrome
+                elem.webkitRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) { // Firefox
+                elem.mozRequestFullScreen();
+            } else if (elem.msRequestFullscreen) { // IE/Edge
+                elem.msRequestFullscreen();
+            }
+        }
+        
+        document.getElementById('masukButton').addEventListener('click', function() {
+            // 1. Sembunyikan slide 1
+            document.getElementById('slide1').style.display = 'none';
+            
+            // 2. Tampilkan slide 2
+            document.getElementById('slide2').style.display = 'block';
+            
+            // 3. Langsung putar audio
+            audioPlayer.play();
+            
+            // 4. Coba minta fullscreen
+            requestFullscreen();
+        });
+    </script>
+
+</body>
+</html>
