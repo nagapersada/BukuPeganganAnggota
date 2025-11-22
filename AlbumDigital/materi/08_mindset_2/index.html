@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motivasi: Fobia dan Dogma</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Reset & Basic Setup */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; /* Mencegah scroll yang tidak perlu */
+        }
+
+        /* Styling Body dengan Background */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('1000164904.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            color: #ffffff;
+        }
+
+        /* Lapisan Overlay untuk Keterbacaan Teks */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.65); /* Gelap untuk kontras */
+            z-index: 1;
+            /* [PERBAIKAN] Tambahkan transisi agar menghilang dengan mulus */
+            transition: opacity 0.7s ease-in-out; 
+        }
+        
+        /* Kontainer Utama untuk Slide */
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        /* Styling Umum untuk Setiap Slide */
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* Menyembunyikan slide yang tidak aktif */
+        .slide.hidden {
+            display: none;
+        }
+        
+        /* === SLIDE 1: HALAMAN PEMBUKA === */
+
+        .quote-container {
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .quote {
+            font-size: clamp(1.5rem, 4vw, 2.2rem); /* Ukuran font responsif */
+            font-weight: 300;
+            font-style: italic;
+            line-height: 1.5;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+        }
+        
+        #enterButton {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: transparent;
+            border: 2px solid #fff;
+            border-radius: 50px; /* Bentuk pil yang modern */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #enterButton:hover {
+            background-color: #fff;
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        /* === SLIDE 2: PEMUTAR AUDIO === */
+
+        #slide2 {
+            justify-content: flex-end; /* Mendorong konten ke bawah */
+        }
+
+        .audio-player-container {
+            width: 100%;
+            max-width: 700px;
+            padding-bottom: 50px; /* Jarak dari tepi bawah */
+        }
+
+        #audioPlayer {
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        
+        <div id="slide1" class="slide">
+            <div class="quote-container">
+                <p class="quote">“Setiap fobia adalah bayangan masa lalu, dan setiap dogma adalah dinding yang harus ditembus untuk melihat cahaya baru.”</p>
+            </div>
+            <button id="enterButton">Mulai Dengar</button>
+        </div>
+        
+        <div id="slide2" class="slide hidden">
+            <div class="audio-player-container">
+                <audio id="audioPlayer" controls controlsList="nodownload">
+                    <source src="Fobia dan Dogma(2).mp3" type="audio/mpeg">
+                    Browser Anda tidak mendukung elemen audio.
+                </audio>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const enterButton = document.getElementById('enterButton');
+        const slide1 = document.getElementById('slide1');
+        const slide2 = document.getElementById('slide2');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const elem = document.documentElement; // Target elemen untuk fullscreen
+
+        // [PERBAIKAN] Ambil elemen overlay
+        const overlay = document.querySelector('.overlay');
+
+        /* Fungsi untuk mengaktifkan Fullscreen di berbagai browser */
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+        }
+
+        enterButton.addEventListener('click', () => {
+            // Panggil fungsi fullscreen
+            openFullscreen();
+
+            // Sembunyikan slide pertama dan tampilkan slide kedua
+            slide1.classList.add('hidden');
+            slide2.classList.remove('hidden');
+
+            // [PERBAIKAN] Hilangkan overlay dengan mengubah opacity-nya
+            overlay.style.opacity = '0';
+
+            // Putar audio secara otomatis setelah user berinteraksi (penting untuk mobile)
+            audioPlayer.play().catch(error => {
+                console.log("Autoplay dicegah oleh browser:", error);
+                // Jika autoplay gagal, user masih bisa menekan tombol play manual.
+            });
+        });
+    </script>
+</body>
+</html>
