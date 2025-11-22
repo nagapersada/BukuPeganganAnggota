@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Album Digital Naga Persada</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000"/>
+
+    <style>
+        /* --- 1. RESET --- */
+        body { background-color: #000; font-family: 'Inter', sans-serif; margin: 0; padding: 0; width: 100vw; height: 100dvh; overflow: hidden; }
+
+        /* --- 2. INTRO --- */
+        #intro-screen {
+            position: fixed; inset: 0; z-index: 100; background: #111827;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow-y: auto; padding: 20px; transition: opacity 0.5s;
+        }
+        .intro-content { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; width: 100%; max-width: 900px; margin: auto; padding-top: env(safe-area-inset-top); }
+        .intro-logo { width: 140px; height: auto; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)); }
+
+        @media (orientation: landscape) {
+            .intro-content { flex-direction: row; text-align: left; gap: 40px; padding: 0 60px; justify-content: center; }
+            .intro-logo { width: 180px; margin-bottom: 0; }
+            .text-group { align-items: flex-start; display: flex; flex-direction: column; }
+        }
+
+        /* --- 3. SLIDER UTAMA --- */
+        #book-view { position: fixed; inset: 0; background: #000; z-index: 50; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        #book-view.active { display: flex; }
+        .slide-wrapper { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
+        .slide-img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); }
+
+        /* TOMBOL BUKA MATERI */
+        .action-btn {
+            position: absolute; z-index: 60; cursor: pointer;
+            background: rgba(220, 38, 38, 0.95); color: white; font-weight: 700; padding: 12px 30px; 
+            border-radius: 50px; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: transform 0.2s; font-size: 1rem; white-space: nowrap;
+        }
+        .action-btn:active { transform: scale(0.95); }
+        @media (orientation: portrait) { .action-btn { bottom: max(50px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); } }
+        @media (orientation: landscape) { .action-btn { right: max(40px, env(safe-area-inset-right)); bottom: max(40px, env(safe-area-inset-bottom)); } }
+
+        /* --- 4. TOMBOL KEMBALI (OVERLAY SANGAT KUAT) --- */
+        /* Wadah tombol kembali agar tidak tertutup iframe */
+        #overlay-controls {
+            position: fixed; top: 0; left: 0; width: 100%; height: 0; /* Height 0 agar tidak block klik di bawahnya */
+            z-index: 2147483647; /* Z-Index Maksimal Browser */
+            display: none; /* Muncul via JS */
+        }
+        
+        .floating-back-btn {
+            position: absolute; 
+            top: max(20px, env(safe-area-inset-top)); 
+            left: 20px;
+            pointer-events: auto; /* Aktifkan klik hanya pada tombol */
+            background: #dc2626; color: white;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 24px; border-radius: 50px;
+            font-weight: 800; font-size: 0.85rem; cursor: pointer;
+            border: 2px solid white; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .floating-back-btn:active { transform: scale(0.95); background: #b91c1c; }
+
+        /* --- 5. VIEWER --- */
+        #material-viewer { position: fixed; inset: 0; z-index: 9000; background: #fff; display: none; }
+        #material-viewer.active { display: block; }
+        #content-frame { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+
+        /* --- 6. NAVIGASI & TOC --- */
+        .nav-btn {
+            position: fixed; top: max(20px, env(safe-area-inset-top)); z-index: 70;
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            color: white; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);
+        }
+        #btn-back { left: 20px; } #btn-toc { right: 20px; }
+        .click-zone { position: absolute; top: 0; bottom: 0; width: 20%; z-index: 55; cursor: pointer; }
+        .zone-left { left: 0; } .zone-right { right: 0; }
+
+        #toc-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; padding: 20px; padding-top: 80px; overflow-y: auto; }
+        #toc-modal.show { display: block; animation: fadeIn 0.2s; }
+        .toc-item { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #374151; color: #d1d5db; cursor: pointer; }
+        @keyframes fadeIn { from {opacity:0} to {opacity:1}}
+    </style>
+</head>
+<body>
+
+    <div id="overlay-controls">
+        <div id="close-material" class="floating-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            <span>KEMBALI KE ALBUM</span>
+        </div>
+    </div>
+
+    <div id="intro-screen">
+        <div class="intro-content">
+            <img src="images/dvteam-logo.png" alt="Logo" class="intro-logo" 
+                 onerror="this.onerror=null; this.src='dvteam-logo.png';">
+            
+            <div class="text-group">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-3 leading-tight">Buku Digital</h1>
+                <p class="text-gray-400 text-lg md:text-2xl mb-8">Naga Persada Collection</p>
+                <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-xl transition transform active:scale-95 ring-1 ring-white/20 text-lg">BUKA ALBUM</button>
+            </div>
+        </div>
+        <div class="mt-12 text-xs text-gray-600 text-center w-full absolute bottom-4">&copy; 2025 DVTEAM NP</div>
+    </div>
+
+    <div id="book-view">
+        <div id="btn-back" class="nav-btn">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </div>
+        <div id="btn-toc" class="nav-btn">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </div>
+        <div class="click-zone zone-left" onclick="prevSlide()"></div>
+        <div class="click-zone zone-right" onclick="nextSlide()"></div>
+        <div id="slide-content" class="slide-wrapper"></div>
+    </div>
+
+    <div id="material-viewer">
+        <iframe id="content-frame" title="Viewer"></iframe>
+    </div>
+
+    <div id="toc-modal">
+        <div class="flex justify-between items-center mb-6 text-white border-b border-gray-700 pb-4">
+            <h2 class="text-2xl font-bold">Daftar Isi</h2>
+            <button id="close-toc" class="text-4xl hover:text-red-500 transition">&times;</button>
+        </div>
+        <div id="toc-list"></div>
+    </div>
+
+    <script>
+        const pages = [
+            { title: 'OPALP & DVTEAM', src: 'images/1000167342.png', localPath: 'materi/01_opalp/index.html', color: 'text-sky-400' },
+            { title: 'Belajar Presentasi', src: 'images/1000167341.jpg', localPath: 'materi/02_presentasi/index.html', color: 'text-orange-400' },
+            { title: 'Langkah Awal & Metode', src: 'images/1000167340.jpg', localPath: 'materi/03_langkah_awal/index.html', color: 'text-gray-300' },
+            { title: 'Daftar Inventaris Aset', src: 'images/1000167339.jpg', localPath: 'materi/04_aset/index.html', color: 'text-amber-400' },
+            { title: 'Motivasi: Pedang Kaisar', src: 'images/1000167338.jpg', localPath: 'materi/05_motivasi_1/index.html', color: 'text-red-500' },
+            { title: 'Sinyal Ke-4', src: 'images/1000167334.jpg', localPath: 'materi/06_motivasi_2/index.html', color: 'text-blue-400' },
+            { title: 'Musuh Yg Sebenarnya', src: 'images/1000167337.jpg', localPath: 'materi/07_mindset_1/index.html', color: 'text-emerald-400' },
+            { title: 'Fobia, Dogma & Paradigma', src: 'images/1000167336.jpg', localPath: 'materi/08_mindset_2/index.html', color: 'text-yellow-300' },
+            { title: '4 Pilar Utama', src: 'images/1000167335.jpg', localPath: 'materi/09_pilar/index.html', color: 'text-violet-400' },
+            { title: 'Habis Gelap Terbitlah Terang', src: 'images/1000167324.jpg', localPath: 'materi/10_visi/index.html', color: 'text-pink-400' },
+            { title: '5 Kunci Sukses', src: 'images/1000168517.png', localPath: 'materi/11_kunci/index.html', color: 'text-lime-400' },
+            { title: 'Aplikasi Daftar Nama', src: 'images/1000168510.png', localPath: 'materi/12_tools/index.html', color: 'text-fuchsia-400' }
+        ];
+
+        let currentIndex = 0;
+
+        function renderSlide(index) {
+            const container = document.getElementById('slide-content');
+            const page = pages[index];
+            container.innerHTML = '';
+            
+            const img = document.createElement('img');
+            // PINTAR: Coba load dari folder images/, kalau gagal load dari root (nama file saja)
+            img.src = page.src; 
+            img.onerror = function() { 
+                this.onerror = null; 
+                this.src = page.src.replace('images/', ''); 
+            };
+            img.className = 'slide-img'; img.draggable = false;
+
+            const btn = document.createElement('button');
+            btn.className = 'action-btn'; btn.innerHTML = `BUKA MATERI`;
+            btn.onclick = (e) => { e.stopPropagation(); openMaterial(page); };
+
+            container.appendChild(img);
+            container.appendChild(btn);
+        }
+
+        function openMaterial(page) {
+            // Push State untuk handle back button HP
+            history.pushState({ modal: true }, null, "");
+            
+            document.getElementById('content-frame').src = page.localPath;
+            document.getElementById('material-viewer').classList.add('active');
+            
+            // TAMPILKAN OVERLAY TOMBOL KEMBALI
+            document.getElementById('overlay-controls').style.display = 'block';
+        }
+        
+        function closeMaterial(triggeredByBrowser = false) {
+            document.getElementById('material-viewer').classList.remove('active');
+            document.getElementById('overlay-controls').style.display = 'none';
+            
+            setTimeout(() => { document.getElementById('content-frame').src = ''; }, 300);
+
+            if (!triggeredByBrowser) history.back();
+            
+            // RE-FULLSCREEN JIKA LEPAS
+            if(document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(()=>{});
+            }
+        }
+
+        // BACK BUTTON HP HANDLER
+        window.onpopstate = function(event) {
+            if (document.getElementById('material-viewer').classList.contains('active')) {
+                closeMaterial(true);
+            }
+        };
+
+        function renderTOC() {
+            const list = document.getElementById('toc-list');
+            list.innerHTML = '';
+            pages.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = 'toc-item';
+                div.innerHTML = `<span class="${p.color} mr-4 text-xl">●</span> <span class="text-lg">${p.title}</span>`;
+                div.onclick = () => { currentIndex = i; renderSlide(i); document.getElementById('toc-modal').classList.remove('show'); };
+                list.appendChild(div);
+            });
+        }
+
+        function nextSlide() { currentIndex = (currentIndex + 1) % pages.length; renderSlide(currentIndex); }
+        function prevSlide() { currentIndex = (currentIndex - 1 + pages.length) % pages.length; renderSlide(currentIndex); }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(regs => { for(let r of regs) r.unregister(); });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTOC();
+            document.getElementById('start-btn').onclick = function() {
+                this.innerHTML = "MEMUAT...";
+                setTimeout(() => {
+                    document.getElementById('intro-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('intro-screen').style.display = 'none';
+                        document.getElementById('book-view').classList.add('active');
+                        renderSlide(currentIndex);
+                    }, 500);
+                    if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+                }, 300);
+            };
+
+            document.getElementById('btn-back').onclick = () => {
+                document.getElementById('book-view').classList.remove('active');
+                document.getElementById('intro-screen').style.display = 'flex';
+                setTimeout(() => { document.getElementById('intro-screen').style.opacity = '1'; }, 50);
+                document.getElementById('start-btn').innerHTML = "BUKA ALBUM"; 
+            };
+
+            const modal = document.getElementById('toc-modal');
+            document.getElementById('btn-toc').onclick = () => modal.classList.add('show');
+            document.getElementById('close-toc').onclick = () => modal.classList.remove('show');
+            
+            // KLIK TOMBOL MERAH KEMBALI
+            document.getElementById('close-material').onclick = () => closeMaterial(false);
+            
+            document.addEventListener('keydown', (e) => {
+                if(!document.getElementById('book-view').classList.contains('active')) return;
+                if(document.getElementById('material-viewer').classList.contains('active')) return;
+                if(e.key === 'ArrowRight') nextSlide();
+                if(e.key === 'ArrowLeft') prevSlide();
+            });
+        });
+    </script>
+</body>
+</html>
