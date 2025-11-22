@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presentasi Eksklusif: Peluang Kebebasan Finansial Anda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-bg: #0f0c29;
+      --secondary-bg: #302b63;
+      --tertiary-bg: #24243e;
+      --accent-gold: #ffd700;
+      --accent-gold-hover: #e6c300;
+      --text-light: #f0f0f0;
+      --text-dark: #333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, var(--primary-bg), var(--secondary-bg), var(--tertiary-bg));
+      color: var(--text-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+      transition: background 0.5s ease;
+    }
+
+    /* --- Splash Screen --- */
+    #splash-screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      transition: opacity 0.5s ease-in-out;
+    }
+    
+    #splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #start-button {
+      padding: 18px 35px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      background-color: var(--accent-gold);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    #start-button:hover {
+      background-color: var(--accent-gold-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+    }
+    
+    .splash-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .splash-subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 2.5rem;
+        max-width: 600px;
+        opacity: 0.9;
+    }
+
+
+    /* --- Main Content --- */
+    #main-content {
+      max-width: 700px;
+      width: 95%;
+      margin: auto;
+      background: rgba(15, 12, 41, 0.5);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .header-title {
+      color: var(--accent-gold);
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    
+    .header-subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        opacity: 0.8;
+    }
+    
+    .presenter-header {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        opacity: 0.7;
+        font-style: italic;
+    }
+
+    .audio-visual {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 20px;
+      height: 40px;
+      align-items: flex-end;
+    }
+
+    .eq-bar {
+      width: 8px;
+      background: linear-gradient(var(--accent-gold), var(--accent-gold-hover));
+      animation: equalize 1.2s infinite ease-in-out;
+      border-radius: 4px;
+    }
+    
+    .eq-bar:nth-child(1){animation-delay:0s;}
+    .eq-bar:nth-child(2){animation-delay:0.2s;}
+    .eq-bar:nth-child(3){animation-delay:0.4s;}
+    .eq-bar:nth-child(4){animation-delay:0.6s;}
+    .eq-bar:nth-child(5){animation-delay:0.8s;}
+
+    @keyframes equalize {
+      0%, 100% {height: 5px;}
+      50% {height: 40px;}
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .timestamps {
+      margin-top: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .timestamps button {
+      padding: 10px 15px;
+      border: 1px solid var(--accent-gold);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--accent-gold);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .timestamps button:hover {
+      background: var(--accent-gold);
+      color: var(--text-dark);
+      transform: scale(1.05);
+    }
+    
+    .cta-wrapper {
+        margin-top: 30px;
+        border-top: 1px solid rgba(255, 215, 0, 0.2);
+        padding-top: 30px;
+    }
+    
+    #cta-button {
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      background-color: var(--accent-gold);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    #cta-button:hover {
+      background-color: var(--accent-gold-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+    }
+    
+    /* --- Modal Styles --- */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        display: none; /* Hidden by default */
+        justify-content: center;
+        align-items: center;
+        z-index: 200;
+    }
+
+    .modal-content {
+        background: var(--tertiary-bg);
+        padding: 40px;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255, 215, 0, 0.2);
+    }
+
+    .close-button {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 1.5rem;
+        color: var(--text-light);
+        cursor: pointer;
+        background: none;
+        border: none;
+    }
+
+    .modal-content h2 {
+        color: var(--accent-gold);
+        margin-bottom: 15px;
+    }
+    
+    .modal-content p {
+        margin-bottom: 25px;
+        opacity: 0.9;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    
+    .modal-link-button {
+        display: inline-block;
+        padding: 12px 25px;
+        background: var(--accent-gold);
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 700;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .modal-link-button:hover {
+        background: var(--accent-gold-hover);
+        transform: scale(1.05);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="splash-screen">
+      <h2 class="splash-title">Selamat Datang</h2>
+      <p class="splash-subtitle">Anda akan mendengarkan presentasi tentang peluang untuk mengubah masa depan finansial Anda. Klik untuk memulai.</p>
+      <button id="start-button">▶ Mulai Presentasi</button>
+  </div>
+
+  <div id="main-content">
+    <h1 class="header-title">Presentasi Peluang Bisnis Modern</h1>
+    <h3 class="header-subtitle">Oleh: Deka Sonjaya</h3>
+    <h4 class="presenter-header">Dipersembahkan oleh: DV Team Naga Persada</h4>
+    
+    <div class="audio-visual">
+      <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+    </div>
+    
+    <audio id="presentation" controls>
+      <source src="audio_lengkap.mp3" type="audio/mpeg">
+      Browser Anda tidak mendukung elemen audio.
+    </audio>
+    
+    <div class="timestamps">
+      <button onclick="seek(19.3)">🎯 Impian Kita Semua</button>
+      <button onclick="seek(76)">⚠️ Masalah Ekonomi Saat Ini</button>
+      <button onclick="seek(107.9)">💡 Solusi Bisnis Modern</button>
+      <button onclick="seek(151.6)">🤝 Ekosistem DV & Opalpie</button>
+      <button onclick="seek(225.2)">🚀 4 Keunggulan Utama</button>
+      <button onclick="seek(283.7)">👉 Cara Memulai</button>
+      <button onclick="seek(330.3)">💰 Potensi Keuntungan</button>
+      <button onclick="seek(386.3)">🔢 Konsep 3 Langkah Mudah</button>
+      <button onclick="seek(416.3)">🏝️ Visi Kebebasan Finansial</button>
+      <button onclick="seek(512.5)">📣 Panggilan Aksi & Motivasi</button>
+    </div>
+
+    <div class="cta-wrapper">
+        <button id="cta-button">SAYA TERTARIK & INGIN BERGABUNG!</button>
+    </div>
+  </div>
+  
+  <div id="cta-modal" class="modal-overlay">
+      <div class="modal-content">
+          <button id="close-modal-button" class="close-button">&times;</button>
+          <h2>Langkah Selanjutnya</h2>
+          <p>Segera Hubungi Anggota DVTEAM NP atau klik link di bawah ini.</p>
+          <a href="https://opalp.com//register?inviteId=3S7FNM" target="_blank" class="modal-link-button">Buka Link Pendaftaran</a>
+      </div>
+  </div>
+
+<script>
+  const splashScreen = document.getElementById('splash-screen');
+  const startButton = document.getElementById('start-button');
+  const audioElement = document.getElementById('presentation');
+  const body = document.documentElement;
+
+  // Elemen untuk Modal
+  const ctaButton = document.getElementById('cta-button');
+  const modal = document.getElementById('cta-modal');
+  const closeModalButton = document.getElementById('close-modal-button');
+
+  function openFullscreen() {
+    if (body.requestFullscreen) body.requestFullscreen();
+    else if (body.webkitRequestFullscreen) body.webkitRequestFullscreen();
+    else if (body.msRequestFullscreen) body.msRequestFullscreen();
+  }
+
+  startButton.addEventListener('click', () => {
+    audioElement.play();
+    openFullscreen();
+    splashScreen.classList.add('hidden');
+  });
+
+  function seek(seconds) {
+    audioElement.currentTime = seconds;
+    audioElement.play();
+  }
+
+  // Event listener untuk membuka modal
+  ctaButton.addEventListener('click', () => {
+      modal.style.display = 'flex';
+  });
+
+  // Event listener untuk menutup modal
+  closeModalButton.addEventListener('click', () => {
+      modal.style.display = 'none';
+  });
+
+  // Juga tutup modal jika klik di luar area kontennya
+  modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+          modal.style.display = 'none';
+      }
+  });
+
+</script>
+</body>
+</html>
