@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Motivasi: Fobia dan Dogma</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. RESET & VARIABEL --- */
+        :root {
+            --bg-dark: #080808;
+            --text-gold: #D4AF37; 
+            --text-white: #F5F5F5;
+            --text-muted: #A3A3A3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            width: 100%; height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            overflow: hidden;
+        }
+
+        /* --- 2. LAYOUT UTAMA (SPLIT) --- */
+        .app-container {
+            display: flex;
+            width: 100%; height: 100vh; height: 100dvh;
+        }
+
+        /* --- 3. VISUAL (GAMBAR KSATRIA) --- */
+        .visual-side {
+            position: relative;
+            /* GANTI NAMA FILE DI SINI JIKA BERBEDA */
+            background-image: url('1000164904.jpg'); 
+            background-size: cover;
+            
+            /* KUNCI UTAMA: Agar kepala tidak terpotong */
+            background-position: center top; 
+            background-repeat: no-repeat;
+        }
+
+        /* Gradasi agar teks terbaca & transisi halus */
+        .visual-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(8,8,8,0) 60%, rgba(8,8,8,1) 100%);
+        }
+
+        /* --- 4. KONTEN (TEKS & PLAYER) --- */
+        .content-side {
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 40px;
+            background: var(--bg-dark);
+            position: relative; z-index: 10;
+            text-align: center;
+        }
+
+        /* Typography */
+        .quote-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: var(--text-white);
+            font-style: italic;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .quote-text span {
+            color: var(--text-gold);
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        .divider {
+            width: 40px; height: 3px;
+            background-color: var(--text-gold);
+            margin: 0 auto 20px auto;
+            border-radius: 2px;
+        }
+
+        /* Audio Player Styling */
+        .player-container {
+            width: 100%; max-width: 400px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        audio { width: 100%; height: 40px; outline: none; }
+        audio::-webkit-media-controls-panel { background-color: #e0e0e0; }
+
+        /* --- 5. TOMBOL KEMBALI (ELEGAN & PRESISI) --- */
+        .back-btn {
+            position: absolute;
+            top: 20px; left: 20px;
+            z-index: 50;
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            color: white;
+            font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        .back-btn svg { width: 18px; height: 18px; }
+
+        /* --- 6. RESPONSIVE RULES --- */
+
+        /* MODE PORTRAIT (HP) */
+        @media (orientation: portrait) {
+            .app-container { flex-direction: column; }
+            
+            .visual-side {
+                flex: 1.2; /* Gambar lebih tinggi (60%) agar gagah */
+                width: 100%;
+            }
+            
+            .visual-overlay {
+                background: linear-gradient(to bottom, rgba(8,8,8,0) 50%, rgba(8,8,8,1) 100%);
+            }
+
+            .content-side {
+                flex: 0.8; /* Konten 40% */
+                padding: 30px 20px;
+                box-shadow: 0 -30px 60px rgba(0,0,0,0.8); /* Shadow blending */
+            }
+            
+            /* Penyesuaian posisi tombol kembali di portrait */
+            .back-btn { top: 25px; left: 25px; }
+        }
+
+        /* MODE LANDSCAPE (PC / Tablet / HP Miring) */
+        @media (orientation: landscape) {
+            .app-container { flex-direction: row; }
+
+            .visual-side {
+                flex: 1; /* Lebar 50% */
+                height: 100%;
+                border-right: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .visual-overlay {
+                background: linear-gradient(to right, rgba(8,8,8,0) 70%, rgba(8,8,8,1) 100%);
+            }
+
+            .content-side {
+                flex: 1; /* Lebar 50% */
+                height: 100%;
+            }
+
+            .quote-text { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-btn" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        KEMBALI
+    </a>
+
+    <div class="app-container">
+        
+        <div class="visual-side">
+            <div class="visual-overlay"></div>
+        </div>
+
+        <div class="content-side">
+            <div class="divider"></div>
+            
+            <div class="quote-text">
+                “Setiap <span>Fobia</span> adalah bayangan masa lalu, dan setiap <span>Dogma</span> adalah dinding yang harus ditembus untuk melihat cahaya baru.”
+            </div>
+
+            <div class="player-container">
+                <div style="text-align:center; margin-bottom:10px; font-size:0.8rem; color:var(--text-muted); letter-spacing:2px;">NOW PLAYING</div>
+                <audio id="player" controls controlsList="nodownload">
+                    <source src="Fobia dan Dogma(2).mp3" type="audio/mpeg">
+                    Browser Anda tidak mendukung elemen audio.
+                </audio>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Fungsi Back
+        function goBack() {
+            // Jika dibuka di dalam iframe/aplikasi utama
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback jika tidak ada history
+                window.close(); 
+            }
+        }
+
+        // Auto-Fullscreen saat play (Opsional)
+        const player = document.getElementById('player');
+        player.addEventListener('play', () => {
+            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(e => {});
+            }
+        });
+    </script>
+
+</body>
+</html>
