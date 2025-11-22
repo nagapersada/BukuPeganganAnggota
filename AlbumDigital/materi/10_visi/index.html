@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Habis Gelap Terbitlah Terang</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. RESET & STYLE --- */
+        :root {
+            --bg-dark: #0a0a0a;
+            --text-gold: #E0B853;
+            --text-white: #F5F5F5;
+            --text-muted: #A0A0A0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            width: 100%; height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            overflow: hidden;
+        }
+
+        /* --- 2. LAYOUT UTAMA --- */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh; /* Fix untuk browser HP modern */
+        }
+
+        /* --- 3. BAGIAN GAMBAR (VISUAL) --- */
+        .visual-side {
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* GAMBAR DIKUNCI AGAR TIDAK PECAH/KEPOTONG */
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center; /* Fokus ke atas */
+            display: block;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(10,10,10,0) 60%, rgba(10,10,10,1) 100%);
+        }
+
+        /* --- 4. BAGIAN KONTEN --- */
+        .content-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            background: var(--bg-dark);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* TIPOGRAFI */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            line-height: 1.3;
+            margin-bottom: 15px;
+            color: var(--text-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            max-width: 500px;
+            font-weight: 300;
+        }
+
+        .divider {
+            width: 50px;
+            height: 3px;
+            background-color: var(--text-gold);
+            margin: 0 auto 20px auto;
+            border-radius: 2px;
+        }
+
+        /* PLAYER AUDIO */
+        .audio-wrapper {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .now-playing {
+            font-size: 0.75rem;
+            color: var(--text-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        audio {
+            width: 100%;
+            height: 40px;
+            outline: none;
+        }
+        
+        audio::-webkit-media-controls-panel {
+            background-color: #e0e0e0;
+        }
+
+        /* --- 5. RESPONSIVE (POTRAIT VS LANDSCAPE) --- */
+
+        /* MODE PORTRAIT (HP Tegak) */
+        @media (orientation: portrait) {
+            .app-container {
+                flex-direction: column; /* Atas Bawah */
+            }
+            
+            .visual-side {
+                flex: 1.2; /* Gambar 60% */
+                order: 1;
+            }
+            
+            .content-side {
+                flex: 0.8; /* Konten 40% */
+                order: 2;
+                padding: 20px;
+                box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
+            }
+
+            h1 { font-size: 1.5rem; }
+        }
+
+        /* MODE LANDSCAPE (HP Miring / PC) */
+        @media (orientation: landscape) {
+            .app-container {
+                flex-direction: row; /* Kiri Kanan */
+            }
+
+            .visual-side {
+                flex: 1; /* Kiri 50% */
+                order: 1;
+                border-right: 1px solid rgba(255,255,255,0.1);
+            }
+            
+            .overlay {
+                /* Gradasi samping untuk landscape */
+                background: linear-gradient(to right, rgba(10,10,10,0) 60%, rgba(10,10,10,1) 100%);
+            }
+
+            .content-side {
+                flex: 1; /* Kanan 50% */
+                order: 2;
+            }
+
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="visual-side">
+            <img src="1000163835.jpg" class="hero-image" alt="Cover Image">
+            <div class="overlay"></div>
+        </div>
+
+        <div class="content-side">
+            <h1>Buka Potensi Anda</h1>
+            <div class="divider"></div>
+            
+            <p>
+                Sebuah langkah kecil hari ini adalah lompatan besar untuk masa depan finansial Anda.<br>
+                <i style="color: var(--text-gold); margin-top: 10px; display: block;">"Habis Gelap Terbitlah Terang"</i>
+            </p>
+
+            <div class="audio-wrapper">
+                <div class="now-playing">Audio Experience</div>
+                <audio id="player" controls controlsList="nodownload">
+                    <source src="HGTTERANG(2).mp3" type="audio/mpeg">
+                    Browser Anda tidak mendukung elemen audio.
+                </audio>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Script Auto Fullscreen saat Play (Opsional)
+        const player = document.getElementById('player');
+        
+        player.addEventListener('play', () => {
+            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(e => {});
+            }
+        });
+    </script>
+
+</body>
+</html>
