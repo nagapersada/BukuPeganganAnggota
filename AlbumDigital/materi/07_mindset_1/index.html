@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motivasi Ksatria</title>
+  <style>
+    /* Reset dasar & Pengaturan Body */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      width: 100%;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* Pengaturan utama untuk setiap layar */
+    .screen {
+      display: none; /* Sembunyi secara default */
+      height: 100vh; /* Tinggi 100% dari viewport */
+      width: 100vw; /* Lebar 100% dari viewport */
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      color: white;
+      
+      /* Pengaturan Background yang Benar */
+      background-image: url("./knight.png");
+      background-color: #000; /* Warna cadangan jika gambar gagal dimuat */
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+    }
+
+    /* Pengaturan teks agar mudah dibaca */
+    h1, p {
+      text-shadow: 2px 2px 8px #000;
+      max-width: 90%;
+    }
+
+    /* Tombol */
+    .btn {
+      margin-top: 30px;
+      padding: 15px 25px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 2px 2px 8px #000;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+    }
+
+    /* --- Perbaikan Tata Letak Khusus --- */
+
+    /* Layar 1: Tampilkan pertama & Konten di tengah */
+    #screen1 {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Layar 2: Konten di bawah */
+    #screen2 {
+      justify-content: flex-end; /* Dorong semua item ke bawah */
+      padding-bottom: 5vh; /* Beri sedikit jarak dari tepi bawah */
+    }
+
+    /* Judul di layar 2 */
+    #screen2 h1 {
+      margin-bottom: 25px; /* Jarak antara judul dan pemutar audio */
+    }
+    
+    /* Kotak pemutar audio */
+    .audio-box {
+      width: 90%;
+      max-width: 450px;
+    }
+    audio {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="screen" id="screen1">
+    <h1>⚔️ Gempur dulu musuh di dalam kepalamu!</h1>
+    <p>Maka dunia akan bertekuk lutut.<br><br>
+    <strong>Raungkan sumpahmu:</strong><br>
+    TIDAK PULANG SEBELUM MENANG!</p>
+    <button class="btn" onclick="goToAudio()">▶️ Masuk ke Narasi Utama</button>
+  </div>
+
+  <div class="screen" id="screen2">
+    <h1>🎧 Dengarkan Narasi Utama</h1>
+    <div class="audio-box">
+      <audio id="player" controls>
+        <source src="./pejuangtangguh2(2).mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung pemutar audio.
+      </audio>
+    </div>
+  </div>
+
+  <script>
+    function goToAudio() {
+      const screen1 = document.getElementById("screen1");
+      const screen2 = document.getElementById("screen2");
+      const player = document.getElementById("player");
+      const elem = document.documentElement;
+
+      // 1. Minta Fullscreen
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => {
+          console.error(`Gagal mode fullscreen: ${err.message}`);
+        });
+      } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen();
+      }
+
+      // 2. Ganti layar
+      screen1.style.display = "none";
+      screen2.style.display = "flex";
+
+      // 3. Putar audio
+      player.play().catch(error => {
+        console.log("Autoplay dicegah oleh browser.");
+      });
+    }
+  </script>
+</body>
+</html>
