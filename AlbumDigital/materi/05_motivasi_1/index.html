@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REVOLUSI FINANSIAL | DK SONJAYA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* CSS RESET dan Pengaturan Dasar */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Montserrat', sans-serif;
+            color: #E0E0E0;
+            background-color: #0d0d0d; /* Hitam pekat untuk kesan premium */
+            overflow: hidden; 
+            transition: background-color 0.5s;
+        }
+
+        /* --- SLIDE AWAL: MOTIVASI --- */
+        #intro-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 5%;
+            background: linear-gradient(45deg, #1c1a29 0%, #000000 100%); 
+            transition: opacity 1s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .quote {
+            font-size: 2.8vw; /* Ukuran font responsif */
+            font-weight: 300;
+            max-width: 900px;
+            margin-bottom: 70px;
+            color: #FFC300; /* Emas terang (Warna default untuk teks motivasi) */
+            line-height: 1.5;
+            letter-spacing: 1.2px;
+        }
+
+        /* Styling KATA-KATA KHUSUS yang diawali dengan **...** */
+        .quote strong {
+            font-weight: 800; /* Cetak Tebal */
+            color: #FFFFFF !important; /* Warna Putih */
+        }
+        
+        /* Memperbaiki alignment text di beberapa browser dan memastikan pemisah baris bekerja */
+        .quote span {
+            display: block;
+            line-height: inherit;
+        }
+
+
+        /* Styling Tombol Masuk */
+        #enter-button {
+            padding: 18px 40px;
+            font-size: 1.25em;
+            font-weight: 600;
+            color: #0d0d0d;
+            background-color: #FFC300;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 195, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-transform: uppercase;
+        }
+
+        #enter-button:hover {
+            background-color: #FFA500;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(255, 165, 0, 0.7);
+        }
+
+        /* --- SLIDE AUDIO MATERI UTAMA --- */
+        #audio-slide {
+            display: none; /* Sembunyikan di awal */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #audio-slide h2 {
+            /* Judul "Genderang Perang" */
+            font-size: 2.2em;
+            font-weight: 600;
+            margin-bottom: 50px;
+            color: #4CAF50; 
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        /* Styling Custom untuk Player Audio HTML5 Bawaan */
+        #audio-player {
+            width: 90%;
+            max-width: 700px;
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            filter: invert(0); 
+        }
+
+        /* Responsif untuk layar kecil (Ponsel) */
+        @media (max-width: 768px) {
+            .quote {
+                font-size: 6vw; 
+                margin-bottom: 50px;
+            }
+            #audio-slide h2 {
+                font-size: 1.8em;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            #enter-button {
+                font-size: 1em;
+                padding: 15px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="intro-slide">
+        <p class="quote">
+            <span class="line-1">"Seorang **Pemenang**,</span>
+            <span class="line-2">selalu melihat **jalan keluar** dari setiap</span>
+            <span class="line-3">masalah yg dihadapinya,</span>
+            <span class="line-4">sedangkan Para **Pecundang** selalu</span>
+            <span class="line-5">melihat **masalah** dari setiap jalan keluar</span>
+            <span class="line-6">yg ditawarkannya.."</span>
+        </p>
+        <button id="enter-button" onclick="startAudioAndFullscreen()">
+            MASUK KE MATERI UTAMA
+        </button>
+    </div>
+
+    <div id="audio-slide">
+        <h2>GENDERANG PERANG: REVOLUSI FINANSIAL PRIBADI</h2>
+        <audio id="audio-player" controls preload="auto">
+            <source src="paradigma2(2).mp3" type="audio/mp3">
+            Browser Anda tidak mendukung elemen audio MP3. Silakan perbarui browser Anda.
+        </audio>
+    </div>
+
+    <script>
+        // --- SCRIPT UNTUK FUNGSI TAMPILAN KHUSUS ---
+
+        // Fungsi untuk mengganti teks dengan format tebal dan putih
+        function applySpecialFormatting() {
+            const quoteElement = document.querySelector('.quote');
+            let htmlContent = quoteElement.innerHTML;
+
+            // Regex untuk menemukan teks yang diapit oleh ** dan menggantinya dengan tag <strong>
+            // Ini akan membuat teks tebal dan berwarna putih sesuai CSS .quote strong
+            htmlContent = htmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Terapkan perubahan HTML
+            quoteElement.innerHTML = htmlContent;
+        }
+
+        // Jalankan fungsi setelah DOM dimuat
+        document.addEventListener('DOMContentLoaded', applySpecialFormatting);
+
+
+        // --- SCRIPT UNTUK FULLSCREEN DAN NAVIGASI ---
+        var introSlide = document.getElementById('intro-slide');
+        var audioSlide = document.getElementById('audio-slide');
+        var audioPlayer = document.getElementById('audio-player');
+        var htmlElement = document.documentElement;
+        
+        // Fungsi untuk mengaktifkan Full Screen
+        function openFullscreen() {
+            if (htmlElement.requestFullscreen) {
+                htmlElement.requestFullscreen();
+            } else if (htmlElement.webkitRequestFullscreen) { /* Safari */
+                htmlElement.webkitRequestFullscreen();
+            } else if (htmlElement.msRequestFullscreen) { /* IE11 */
+                htmlElement.msRequestFullscreen();
+            }
+        }
+
+        // Fungsi utama untuk beralih slide dan memulai Full Screen
+        function startAudioAndFullscreen() {
+            // 1. Coba aktifkan Full Screen.
+            openFullscreen();
+
+            // 2. Sembunyikan slide intro dengan transisi (Fade Out)
+            introSlide.style.opacity = '0';
+            
+            setTimeout(function() {
+                // Sembunyikan slide intro sepenuhnya
+                introSlide.style.display = 'none';
+                
+                // 3. Tampilkan slide audio
+                audioSlide.style.display = 'flex';
+                
+                // 4. Coba putar audio secara otomatis
+                audioPlayer.play().catch(error => {
+                    console.log("Audio play failed, user must press play: " + error);
+                });
+            }, 1000); 
+        }
+    </script>
+</body>
+</html>
