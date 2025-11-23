@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>5 Kunci Sukses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            /* Gradasi Ungu-Pink sesuai screenshot */
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* CONTAINER KARTU */
+        .slide-container {
+            width: 90%;
+            max-width: 400px;
+            height: 70vh;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 20, 30, 0.6); /* Kartu Gelap Transparan */
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        /* KARTU AKTIF */
+        .card.active {
+            opacity: 1;
+            transform: scale(1);
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        /* ICON HURUF (A, B, C...) */
+        .icon-letter {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(to bottom, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 10px rgba(59, 130, 246, 0.5));
+            margin-bottom: 10px;
+        }
+
+        h2 { font-size: 1.8rem; margin-bottom: 15px; font-weight: 700; }
+        p { font-size: 0.95rem; line-height: 1.6; color: #e2e8f0; }
+        
+        .highlight { color: #fbbf24; font-weight: 600; font-style: italic; margin-top: 15px; display: block; }
+
+        /* INDIKATOR DOTS */
+        .dots {
+            position: absolute; bottom: -40px; left: 0; right: 0;
+            display: flex; justify-content: center; gap: 8px;
+        }
+        .dot {
+            width: 10px; height: 10px; background: rgba(255,255,255,0.3);
+            border-radius: 50%; cursor: pointer; transition: 0.3s;
+        }
+        .dot.active { background: white; transform: scale(1.2); }
+
+        /* NAVIGASI KIRI KANAN */
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            font-size: 2rem; color: rgba(255,255,255,0.5); cursor: pointer;
+            z-index: 20; padding: 20px;
+        }
+        .nav-prev { left: -20px; }
+        .nav-next { right: -20px; }
+        .nav-arrow:hover { color: white; }
+
+    </style>
+</head>
+<body>
+
+    <div class="nav-arrow nav-prev" onclick="prevSlide()">&#10094;</div>
+    <div class="nav-arrow nav-next" onclick="nextSlide()">&#10095;</div>
+
+    <div class="slide-container">
+        
+        <div class="card active">
+            <div class="icon-letter">A</div>
+            <h2>Asosiasi</h2>
+            <p>Lingkungan menentukan masa depan Anda. Berkumpullah dengan para elang jika ingin terbang tinggi.</p>
+            <span class="highlight">"Anda adalah rata-rata dari 5 orang yang paling sering Anda temui."</span>
+        </div>
+
+        <div class="card">
+            <div class="icon-letter">B</div>
+            <h2>Bimbingan</h2>
+            <p>Jangan berjalan sendirian di hutan belantara. Mentor adalah kompas yang mempercepat kesuksesan Anda.</p>
+            <span class="highlight">"Belajar dari pengalaman orang lain adalah cara cerdas untuk sukses."</span>
+        </div>
+
+        <div class="card">
+            <div class="icon-letter">C</div>
+            <h2>Cita-cita</h2>
+            <p>Tanpa tujuan, energi Anda akan terbuang percuma. Tetapkan impian yang jelas dan kejar tanpa henti.</p>
+            <span class="highlight">"Visi yang jelas adalah bahan bakar ketekunan."</span>
+        </div>
+
+        <div class="card">
+            <div class="icon-letter">D</div>
+            <h2>Duplikasi</h2>
+            <p>Sukses bukan tentang Anda sendiri, tapi bagaimana tim ikut tumbuh dan berkembang.</p>
+            <span class="highlight">"Di era digital: sistem yang mudah diduplikasi mempercepat pertumbuhan eksponensial."</span>
+        </div>
+
+        <div class="card">
+            <div class="icon-letter">E</div>
+            <h2>Edukasi</h2>
+            <p>Investasi terbaik adalah investasi leher ke atas. Pengetahuan adalah kunci pintu kekayaan.</p>
+            <span class="highlight">"Orang miskin punya TV besar, orang kaya punya perpustakaan besar."</span>
+        </div>
+
+    </div>
+
+    <div class="dots">
+        <div class="dot active" onclick="goToSlide(0)"></div>
+        <div class="dot" onclick="goToSlide(1)"></div>
+        <div class="dot" onclick="goToSlide(2)"></div>
+        <div class="dot" onclick="goToSlide(3)"></div>
+        <div class="dot" onclick="goToSlide(4)"></div>
+    </div>
+
+    <audio id="bg-audio" loop>
+        <source src="NarasiEdukasi.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.card');
+        const dots = document.querySelectorAll('.dot');
+        const audio = document.getElementById('bg-audio');
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            showSlide(currentSlide);
+        }
+
+        // Coba putar audio saat disentuh pertama kali
+        document.body.addEventListener('click', () => {
+            if(audio.paused) audio.play().catch(()=>{});
+        }, { once: true });
+
+        // Support Swipe di HP
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) nextSlide(); // Geser Kiri
+            if (touchEndX - touchStartX > 50) prevSlide(); // Geser Kanan
+        });
+    </script>
+
+</body>
+</html>
