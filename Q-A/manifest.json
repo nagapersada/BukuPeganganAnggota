@@ -1,0 +1,22 @@
+{
+    "name": "DVNP Question & Answer",
+    "short_name": "DVNP Q&A",
+    "description": "Kumpulan tanya jawab penting untuk tim DV Naga Persada.",
+    "start_url": "index.html",
+    "display": "fullscreen",  /* <-- INI PERUBAHANNYA */
+    "background_color": "#121212",
+    "theme_color": "#FF6600", /* Saya ubah jadi Oranye agar seragam */
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "icons/icon-192x192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "icons/icon-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}
