@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Presentasi DVTEAM NP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Reset & Global Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* Menggunakan Font Inter */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #111;
+            color: #fff;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --- STruktur Slide & Transisi Fade --- */
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: flex; /* Tetap pakai flex untuk centering (Portrait) */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            
+            /* Pengaturan Transisi Fade */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+            
+            /* Default tidak discroll (untuk portrait) */
+            overflow-y: hidden; 
+        }
+
+        /* Kelas 'active' untuk menampilkan slide */
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Animasi fade-in untuk konten slide 1 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Konten Slide 1 --- */
+        #slide1-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            max-width: 600px;
+            /* Terapkan animasi fade-in */
+            animation: fadeIn 1s ease-out 0.2s;
+            animation-fill-mode: backwards;
+        }
+
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 25px;
+            /* Ganti 'logo.jpg' dengan nama file logo naga 'V' Anda */
+            content: url('logo.jpg');
+        }
+
+        .motivational-text {
+            font-size: 1.25rem; /* Sedikit lebih besar */
+            font-style: italic;
+            margin-bottom: 35px;
+            line-height: 1.6;
+            /* Warna putih yang lebih lembut, tidak menyilaukan */
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .audio-button {
+            padding: 16px 32px; /* Sedikit lebih besar */
+            font-size: 1rem;
+            font-weight: bold;
+            color: #000; /* Teks hitam agar kontras */
+            background-color: #fff; /* Latar putih bersih */
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            transition: all 0.3s ease;
+            /* Shadow yang lebih halus dan profesional */
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.15);
+        }
+
+        .audio-button:hover {
+            /* Efek 'lift' (mengangkat) saat di-hover */
+            transform: scale(1.03) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.25);
+        }
+
+        /* --- Konten Slide 2 --- */
+        #slide2 {
+            /* Ganti 'background.jpg' dengan nama file gambar keluarga Anda */
+            background-image: url('background.jpg');
+            
+            /* --- PERBAIKAN UNTUK MASALAH ZOOM DI IPHONE --- */
+            
+            /* 'contain' akan memastikan seluruh gambar terlihat (tidak terpotong) */
+            background-size: contain;
+            /* 'center center' akan memposisikan gambar di tengah */
+            background-position: center center;
+            /* Warna latar belakang untuk mengisi spasi sisa di atas/bawah */
+            background-color: #000; 
+            background-repeat: no-repeat;
+            
+            /* (Opsional) Efek vignette agar fokus ke tengah */
+            box-shadow: inset 0 0 120px 40px rgba(0,0,0,0.5);
+        }
+
+        /* Tombol Tutup (X) */
+        .close-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.4);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            cursor: pointer;
+            z-index: 1001;
+            font-weight: 300;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .close-button:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        /* --- DESAIN ULANG AUDIO PLAYER --- */
+        .audio-player-container {
+            position: fixed;
+            bottom: 30px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            /* Latar belakang yang lebih halus */
+            background: rgba(20, 20, 20, 0.65);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            /* Efek blur (Frost Glass) */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            /* Border yang sangat tipis */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .custom-player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        #playPauseBtn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-right: 15px;
+            flex-shrink: 0; /* Mencegah tombol mengecil */
+        }
+
+        #playPauseBtn .icon {
+            width: 32px; /* Sedikit lebih besar */
+            height: 32px;
+            fill: #fff;
+            transition: transform 0.2s ease;
+        }
+        #playPauseBtn:hover .icon {
+            transform: scale(1.1);
+        }
+        #playPauseBtn .pause-icon {
+            display: none;
+        }
+
+        /* Kontainer untuk Seek Bar */
+        .timeline {
+            flex-grow: 1; /* Mengisi sisa ruang */
+            margin: 0 15px;
+        }
+        
+        /* --- Styling Seek Bar Profesional --- */
+        #seekBar {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 5px; /* Track lebih tipis */
+            /* Track 'kosong' */
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.1s linear;
+        }
+
+        /* Thumb (Tombol bulat) untuk Chrome, Safari, Opera, Edge */
+        #seekBar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -5.5px; /* Centering vertikal */
+            border: none;
+        }
+
+        /* Thumb (Tombol bulat) untuk Firefox */
+        #seekBar::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Tampilan Waktu (untuk kedua timer) */
+        .time-display {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.75);
+            min-width: 40px;
+            flex-shrink: 0; /* Mencegah text mengecil */
+        }
+        #currentTimeDisplay {
+            text-align: left;
+            margin-right: 10px; /* Jarak dari seekbar */
+        }
+        #durationDisplay {
+            text-align: right;
+            margin-left: 10px; /* Jarak dari seekbar */
+        }
+
+        /* ====================================================== */
+        /* PERBAIKAN KHUSUS LANDSCAPE AGAR BISA SCROLL           */
+        /* ====================================================== */
+        @media screen and (orientation: landscape) {
+            .slide {
+                display: block; /* Mematikan Flexbox agar flow normal (bisa scroll) */
+                overflow-y: auto; /* Mengaktifkan scrollbar vertikal */
+                -webkit-overflow-scrolling: touch; /* Scroll halus di iOS */
+                padding-top: 60px; /* Jarak aman atas */
+                padding-bottom: 60px; /* Jarak aman bawah */
+            }
+
+            #slide1-content {
+                margin: 0 auto; /* Menengahkan konten secara horizontal */
+            }
+
+            /* Penyesuaian agar background slide 2 tetap bagus saat discroll (jika perlu) */
+            #slide2 {
+                background-attachment: fixed;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="slide1" class="slide active">
+        <div id="slide1-content">
+            <img src="logo.jpg" alt="Logo DVTEAM" class="logo">
+            <p class="motivational-text">
+                "Ini bukan lagi soal trading sendirian, penuh cemas di depan layar...<br>
+                Ini soal membangun komunitas, memimpin tim, dan meraih sukses bersama."
+            </p>
+            <button id="openSlide2" class="audio-button">Materi Audio</button>
+        </div>
+    </div>
+
+    <div id="slide2" class="slide">
+        
+        <button id="closeSlide2" class="close-button">&times;</button>
+
+        <audio id="audioElement" src="presentasiSINGKAT.mp3" preload="metadata" playsinline></audio>
+
+
+        <div class="audio-player-container">
+            <div class="custom-player-controls">
+                
+                <button id="playPauseBtn">
+                    <svg class="icon play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg class="icon pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+
+                <div id="currentTimeDisplay" class="time-display">0:00</div>
+                
+                <div class="timeline">
+                    <input type="range" id="seekBar" value="0" step="0.1">
+                </div>
+
+                <div id="durationDisplay" class="time-display">0:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Ambil semua elemen yang diperlukan ---
+        const slide1 = document.getElementById('slide1');
+        const slide2 = document.getElementById('slide2');
+        const openButton = document.getElementById('openSlide2');
+        const closeButton = document.getElementById('closeSlide2');
+        
+        const audio = document.getElementById('audioElement');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = playPauseBtn.querySelector('.play-icon');
+        const pauseIcon = playPauseBtn.querySelector('.pause-icon');
+        const seekBar = document.getElementById('seekBar');
+        
+        // Element Waktu yang Baru
+        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+        const durationDisplay = document.getElementById('durationDisplay');
+
+        const elem = document.documentElement;
+
+        // --- Fungsi Fullscreen ---
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari, Chrome (termasuk Android) */
+                elem.webkitRequestFullscreen();
+            }
+        }
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari, Chrome, Android */
+                document.webkitExitFullscreen();
+            }
+        }
+
+        // --- Kontrol Slide (Menggunakan Class 'active' untuk Transisi) ---
+        openButton.addEventListener('click', () => {
+            slide1.classList.remove('active'); // Slide 1 fade-out
+            slide2.classList.add('active');   // Slide 2 fade-in
+            openFullscreen();
+            audio.play().catch(error => {
+                console.log("Autoplay dicegah. Perlu interaksi play manual.");
+            });
+        });
+
+        closeButton.addEventListener('click', () => {
+            slide2.classList.remove('active'); // Slide 2 fade-out
+            slide1.classList.add('active');   // Slide 1 fade-in
+            closeFullscreen();
+            audio.pause();
+            audio.currentTime = 0;
+        });
+
+        // --- Logika Pemutar Audio Profesional ---
+
+        // Fungsi format waktu (misal: 125 detik -> "2:05")
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Update Durasi Total saat audio siap
+        audio.addEventListener('loadedmetadata', () => {
+            seekBar.max = audio.duration;
+            durationDisplay.textContent = formatTime(audio.duration);
+        });
+
+        // Update tombol Play/Pause
+        function updatePlayPauseIcon() {
+            if (audio.paused) {
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            } else {
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            }
+        }
+        playPauseBtn.addEventListener('click', () => {
+            audio.paused ? audio.play() : audio.pause();
+        });
+        audio.addEventListener('play', updatePlayPauseIcon);
+        audio.addEventListener('pause', updatePlayPauseIcon);
+
+        // --- Fungsi Utama (Progress Bar & Waktu) ---
+        function updateProgress() {
+            // Update Waktu Berjalan
+            currentTimeDisplay.textContent = formatTime(audio.currentTime);
+            
+            // Update Posisi Seek Bar
+            seekBar.value = audio.currentTime;
+            
+            // Update Latar Belakang Seek Bar (Efek Progress)
+            const progressPercent = (audio.currentTime / audio.duration) * 100;
+            seekBar.style.background = `linear-gradient(to right, #fff ${progressPercent}%, rgba(255, 255, 255, 0.2) ${progressPercent}%)`;
+        }
+
+        // Update saat audio berjalan
+        audio.addEventListener('timeupdate', updateProgress);
+
+        // Update saat seek bar digeser manual
+        seekBar.addEventListener('input', () => {
+            audio.currentTime = seekBar.value;
+            updateProgress(); // Langsung update tampilan saat digeser
+        });
+
+        // Reset saat audio selesai
+        audio.addEventListener('ended', () => { 
+            updatePlayPauseIcon();
+            audio.currentTime = 0;
+            // Reset progress bar
+            seekBar.style.background = `rgba(255, 255, 255, 0.2)`; 
+        });
+
+    </script>
+</body>
+</html>
