@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Membangun Kekuatan</title>
+    
+    <!-- React & Tailwind -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Font Elegan -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #000000;
+            color: white;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow-x: hidden;
+            /* Memastikan scroll bekerja lancar */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Utility untuk menyembunyikan scrollbar tapi tetap bisa scroll */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Animasi masuk/keluar halus */
+        .fade-enter { opacity: 0; transform: scale(0.98); }
+        .fade-enter-active { opacity: 1; transform: scale(1); transition: opacity 800ms ease-out, transform 800ms ease-out; }
+        .fade-exit { opacity: 1; }
+        .fade-exit-active { opacity: 0; transition: opacity 600ms ease-in; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        const App = () => {
+            const [started, setStarted] = useState(false);
+            const [audioError, setAudioError] = useState(false);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const audioRef = useRef(null);
+
+            // === KONFIGURASI FILE ===
+            // Ganti nama file di sini jika ada perubahan
+            const imgIntro = "1000182153.png"; // Gambar Pembuka
+            const imgMain = "1000182152.png";  // Gambar Utama
+            const imgLogo = "logo.png";        // Logo
+            const audioSrc = "angsa dan telur emas.mp3"; 
+
+            const handleEnter = () => {
+                const audio = audioRef.current;
+                if (audio) {
+                    audio.src = audioSrc;
+                    audio.load();
+                    const playPromise = audio.play();
+
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            setIsPlaying(true);
+                            setStarted(true);
+                        }).catch(error => {
+                            console.log("Auto-play prevented, waiting for interaction.");
+                            setStarted(true);
+                            setAudioError(true);
+                        });
+                    }
+                } else {
+                    setStarted(true);
+                }
+            };
+
+            const togglePlay = (e) => {
+                e.stopPropagation();
+                const audio = audioRef.current;
+                if (isPlaying) {
+                    audio.pause();
+                } else {
+                    audio.play();
+                }
+                setIsPlaying(!isPlaying);
+            };
+
+            return (
+                <div className="relative w-full min-h-[100dvh] bg-black">
+                    <audio ref={audioRef} loop />
+
+                    {/* =========================================
+                        SLIDE 1: PEMBUKA (INTRO)
+                       ========================================= */}
+                    <div 
+                        onClick={handleEnter}
+                        className={`
+                            relative z-20 w-full bg-black cursor-pointer transition-opacity duration-700
+                            ${started ? 'opacity-0 pointer-events-none fixed inset-0' : 'opacity-100 min-h-[100dvh]'}
+                        `}
+                    >
+                        {/* CONTAINER GAMBAR INTRO */}
+                        {/* Strategi "Presisi":
+                           - Portrait: h-screen object-contain (Gambar utuh pas di layar)
+                           - Landscape: w-full h-auto (Gambar lebar penuh, tinggi menyesuaikan -> bisa discroll)
+                        */}
+                        <div className="relative w-full h-full flex flex-col items-center justify-center">
+                            
+                            {/* Gambar Background/Utama Slide 1 */}
+                            <img 
+                                src={imgIntro} 
+                                alt="Intro"
+                                className="
+                                    w-full 
+                                    object-contain 
+                                    bg-black
+                                    
+                                    /* Portrait: Paksa tinggi layar penuh agar presisi 'satu layar' */
+                                    portrait:h-[100dvh] 
+                                    portrait:object-contain
+                                    
+                                    /* Landscape: Biarkan tinggi otomatis agar bisa discroll jika panjang */
+                                    landscape:h-auto 
+                                    landscape:min-h-[100dvh]
+                                    landscape:object-cover
+                                "
+                            />
+
+                            {/* LOGO - Floating di Atas */}
+                            <div className="absolute top-0 w-full flex justify-center pt-8 md:pt-12 z-10 pointer-events-none">
+                                <img 
+                                    src={imgLogo} 
+                                    alt="Logo" 
+                                    className="w-24 md:w-32 lg:w-40 object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] filter brightness-110"
+                                />
+                            </div>
+
+                            {/* TOMBOL MASUK - Floating di Bawah */}
+                            <div className="absolute bottom-10 md:bottom-16 w-full flex justify-center z-10 pointer-events-none">
+                                <div className="flex flex-col items-center gap-2 animate-pulse">
+                                    <div className="px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-serif tracking-[0.2em] text-sm md:text-base uppercase shadow-2xl">
+                                        Sentuh Layar
+                                    </div>
+                                    <div className="text-white/50 text-xs tracking-widest mt-1">
+                                        TAP TO ENTER
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* =========================================
+                        SLIDE 2: UTAMA (CONTENT)
+                       ========================================= */}
+                    <div className={`fixed inset-0 z-10 bg-black flex flex-col items-center justify-center transition-all duration-1000 ${started ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+                        
+                        {/* Container Gambar Utama - Scrollable */}
+                        <div className="w-full h-full overflow-y-auto overflow-x-hidden flex items-start md:items-center justify-center scrollbar-hide">
+                            <img 
+                                src={imgMain} 
+                                alt="Main Content" 
+                                className="w-full md:w-auto md:max-w-4xl h-auto md:max-h-[100dvh] object-contain mx-auto"
+                            />
+                        </div>
+
+                        {/* PLAYER AUDIO - Floating Bottom */}
+                        <div className="absolute bottom-6 left-0 right-0 flex justify-center z-50 pointer-events-none">
+                            <div 
+                                className="pointer-events-auto flex items-center gap-4 bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-full pl-2 pr-6 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-transform hover:scale-105 active:scale-95"
+                                onClick={togglePlay}
+                            >
+                                <button 
+                                    className="w-10 h-10 flex items-center justify-center bg-yellow-600 rounded-full text-white shadow-lg"
+                                >
+                                    {isPlaying ? (
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+                                    ) : (
+                                        <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    )}
+                                </button>
+
+                                <div className="flex flex-col text-left">
+                                    <span className="text-[10px] uppercase text-yellow-500 font-bold tracking-widest">Now Playing</span>
+                                    <span className="text-xs text-gray-200 font-medium truncate max-w-[120px]">
+                                        Angsa & Telur Emas
+                                    </span>
+                                </div>
+                                
+                                {isPlaying && (
+                                    <div className="flex items-end gap-1 h-3 mb-1">
+                                        <div className="w-0.5 bg-yellow-500 animate-[bounce_1s_infinite]"></div>
+                                        <div className="w-0.5 bg-yellow-500 animate-[bounce_1.5s_infinite]"></div>
+                                        <div className="w-0.5 bg-yellow-500 animate-[bounce_0.5s_infinite]"></div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
+
