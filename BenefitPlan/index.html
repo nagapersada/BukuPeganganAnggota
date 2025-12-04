@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DVTEAM NP - Benefit Plan</title>
+    
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/BenefitPlan/manifest.json">
+    <link rel="apple-touch-icon" href="/BenefitPlan/images/apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Base Setup & Scroll Fix (Final) --- */
+        html {
+            min-height: 100%;
+            overflow-y: auto; /* Memastikan scroll vertikal aktif */
+            -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #020617; 
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(30, 41, 59, 0.4) 0%, transparent 25%), 
+                radial-gradient(circle at 85% 30%, rgba(79, 70, 229, 0.1) 0%, transparent 25%);
+            color: #e2e8f0; 
+            min-height: 100vh; 
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 99px; }
+
+        /* --- Splash Screen --- */
+        #splash-screen { 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 100; background: #020617; 
+            padding: 2rem; text-align: center; animation: fadeIn 0.8s ease-out forwards; 
+        }
+        .enter-button { 
+            margin-top: 2rem; 
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); 
+            color: #0f172a; padding: 0.8rem 2.5rem; font-weight: 700; border-radius: 99px; 
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); 
+            transition: transform 0.2s; cursor: pointer; 
+        }
+        .enter-button:active { transform: scale(0.95); }
+
+        /* --- Glassmorphism Utils --- */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse-gold { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); color: #fbbf24; } }
+        .number-pulse { animation: pulse-gold 0.3s ease-in-out; }
+        .juara-anim { animation: pulse-gold 1s infinite; }
+
+        /* --- Action Buttons --- */
+        .action-btn { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(30, 41, 59, 0.6); 
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px; 
+            width: 100%;
+            transition: all 0.2s;
+            position: relative; overflow: hidden;
+            padding: 4px;
+        }
+        .action-btn:active:not(:disabled) { transform: scale(0.96); background: rgba(255,255,255,0.1); }
+        .action-btn.clicked { 
+            background: rgba(16, 185, 129, 0.25); 
+            border-color: #10b981; color: #34d399; 
+        }
+        .action-btn:disabled { opacity: 0.5; cursor: default; }
+
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; display: none; }
+        
+        .label-tiny { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 700; }
+        
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <img src="/BenefitPlan/images/logo-splash.png" alt="Logo" class="w-28 mb-5 drop-shadow-lg opacity-90">
+        <h1 class="text-2xl font-bold text-white tracking-tight">Simulator Benefit</h1>
+        <p class="text-slate-400 text-sm mt-2 max-w-xs">Rancang strategi kesuksesan tim Anda.</p>
+        <button id="enter-button" class="enter-button text-base">MULAI</button>
+    </div>
+
+    <div id="dashboard-content" class="hidden w-full relative flex flex-col p-3 md:p-6 max-w-7xl mx-auto pb-24">
+        <canvas id="confetti-canvas"></canvas>
+        
+        <div class="flex-1 flex flex-col md:flex-row gap-4 h-auto">
+            
+            <div class="flex flex-col gap-3 md:w-5/12">
+                
+                <div class="flex justify-between items-center px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-400" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 00-1-1H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 10-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd" /> </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold text-white leading-tight">Dashboard Proyeksi</h1>
+                            <p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold mt-0.5">DVTEAM PLAN</p>
+                        </div>
+                    </div>
+                    <button id="play-audio-button" class="w-9 h-9 rounded-full bg-slate-800/50 border border-white/5 flex items-center justify-center hover:bg-slate-700 transition">
+                        <svg id="speaker-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                        <svg id="speaker-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l-5-5m0 5l5-5" /></svg>
+                    </button>
+                </div>
+
+                <div class="glass-panel rounded-lg p-3 flex justify-between items-center text-xs">
+                    <div class="text-center px-2 border-r border-white/10 w-1/3">
+                        <div class="text-slate-300 text-[10px] font-medium mb-0.5">Ref Lv.1: 5%</div>
+                        <div class="font-bold text-emerald-300 text-sm drop-shadow-sm" id="resBonusReveral1">@300 USDT</div>
+                    </div>
+                    <div class="text-center px-2 border-r border-white/10 w-1/3">
+                        <div class="text-slate-300 text-[10px] font-medium mb-0.5">Ref Lv.2: 2%</div>
+                        <div class="font-bold text-emerald-300 text-sm drop-shadow-sm" id="resBonusReveral2">@300 USDT</div>
+                    </div>
+                    <div class="text-center px-2 w-1/3">
+                        <div class="text-slate-300 text-[10px] font-medium mb-0.5">Bonus Tim</div>
+                        <div class="font-bold text-amber-300 text-sm drop-shadow-sm" id="resBonusTim">20 USDT</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 flex-1 md:flex-none">
+                    <div class="glass-panel rounded-lg p-4 flex flex-col justify-center relative overflow-hidden group">
+                        <div class="absolute top-2 right-2 opacity-10"><svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" /><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" /></svg></div>
+                        <p class="label-tiny mb-1">Batasan Modal</p>
+                        <p class="text-2xl font-bold text-white tracking-tight leading-none" id="resBatasanModal">500</p>
+                    </div>
+                    <div class="glass-panel rounded-lg p-4 flex flex-col justify-center relative overflow-hidden group">
+                        <div class="absolute top-2 right-2 opacity-10"><svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg></div>
+                        <p class="label-tiny mb-1">Total Anggota</p>
+                        <p class="text-2xl font-bold text-white tracking-tight leading-none" id="resTotalAnggotaPanel">0</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-lg p-4 grid grid-cols-2 gap-y-2 gap-x-3 items-center">
+                    <div>
+                        <p class="label-tiny mb-0.5">Saldo Akun</p>
+                        <p class="text-lg font-bold text-slate-100" id="resModalAwalPanel">100</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="label-tiny mb-0.5">Bonus Volume</p>
+                        <p class="text-lg font-bold text-cyan-400" id="resBonusVolume">0%</p>
+                    </div>
+                    <div class="col-span-2 border-t border-white/5 pt-3 mt-1 flex justify-between items-end">
+                        <p class="label-tiny text-amber-500/90 self-center">TOTAL PENDAPATAN</p>
+                        <p class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500" id="kpiTotalBonus">+0</p>
+                    </div>
+                </div>
+
+                <div id="sinyalContainer" class="space-y-1 bg-slate-900/40 rounded-lg p-3 border border-white/5">
+                    </div>
+
+            </div>
+            
+            <div class="flex flex-col gap-3 flex-1">
+                
+                <div class="flex justify-between items-end min-h-[36px] pb-1">
+                    <div class="flex flex-col">
+                         <div class="flex items-center space-x-2">
+                            <div id="anda-label" class="bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold text-[10px] px-3 py-0.5 rounded-md uppercase tracking-wider">ANDA</div>
+                            <div id="crown-icon" class="hidden animate-bounce text-lg">👑</div>
+                        </div>
+                        <div id="ketua-tim-label" class="h-4 mt-1"></div>
+                    </div>
+                    <div class="text-right">
+                        <p class="label-tiny mb-0.5">Peringkat</p>
+                        <div id="kpiStatus" class="flex justify-end"></div>
+                        <div id="kpiBonusPeringkat" class="text-lg font-bold text-amber-400 mt-0.5"></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-lg p-3 flex-none">
+                    <div id="action-button-container" class="w-full">
+                        <div id="phase-1-buttons" class="grid grid-cols-4 gap-3"> 
+                            <button id="btn-tanya" onclick="handlePhase1Click('tanya')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Tanya</span></button>
+                            <button id="btn-cerita" onclick="handlePhase1Click('cerita')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Cerita</span></button>
+                            <button id="btn-undang" onclick="handlePhase1Click('undang')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Undang</span></button>
+                            <button id="btn-jelaskan" onclick="handlePhase1Click('jelaskan')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Jelaskan</span></button>
+                        </div>
+                        
+                        <div id="phase-2-buttons" class="hidden grid grid-cols-4 gap-3">
+                            <button id="btn-sapa" onclick="handlePhase2Click('sapa')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Sapa</span></button>
+                            <button id="btn-sharing" onclick="handlePhase2Click('sharing')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Sharing</span></button>
+                            <button id="btn-solusi" onclick="handlePhase2Click('solusi')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Solusi</span></button>
+                            <button id="btn-duplikasi" onclick="handlePhase2Click('duplikasi')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Duplikasi</span></button>
+                        </div>
+
+                         <div id="phase-3-buttons" class="hidden grid grid-cols-2 gap-4 px-4">
+                            <button id="btn-edifikasi" onclick="handlePhase3Click('edifikasi')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Edifikasi</span></button>
+                            <button id="btn-duplikasi-level" onclick="handlePhase3Click('duplikasi')" class="action-btn group h-16"><svg class="w-5 h-5 text-slate-400 group-hover:text-white mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg><span class="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-200">Level Up</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-lg p-3 flex-1 flex flex-col justify-between" style="min-height: 150px;">
+                    <div id="controls-body" class="w-full mb-2">
+                         </div>
+
+                    <div class="mt-auto">
+                        <div id="fokus-message" class="text-center h-5 flex items-center justify-center">
+                            <p class="text-[10px] font-bold uppercase text-amber-500/70 tracking-[0.3em] animate-pulse">Fokus 5 Anggota</p>
+                        </div>
+                        <div id="juara-message-container" class="text-center h-6 hidden">
+                            <h3 class="juara-text text-xl font-black italic tracking-tighter text-amber-400 juara-anim">JUARA!</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <audio id="tutorial-audio" src="benefit(2).mp3" preload="auto"></audio>
+    <audio id="champions-audio" src="Champions (2).mp3" preload="auto"></audio>
+
+    <script>
+        // --- LOGIC START ---
+        
+        let anggotaLevels = [0, 0, 0, 0, 0]; 
+        let simulationMode = 'recruit_lv1'; 
+        let memberState = {};
+        let phase1ButtonsClicked = { tanya: false, cerita: false, undang: false, jelaskan: false }; 
+        let phase2ButtonsClicked = { sapa: false, sharing: false, solusi: false, duplikasi: false };
+        let phase3ButtonsClicked = { edifikasi: false, duplikasi: false };
+        let currentMemberIndex = 0; let currentBinaIndex = 0;   
+        let currentDuplicationState = { level: 2, memberIndex: 0 }; 
+        const members = ['A', 'B', 'C', 'D', 'E'];
+        let currentPhase = 1; 
+        let confettiInterval; let animationFrameId;
+
+        function resetMemberState() { memberState = { A: { isLeader: false, duplicationLevels: 0 }, B: { isLeader: false, duplicationLevels: 0 }, C: { isLeader: false, duplicationLevels: 0 }, D: { isLeader: false, duplicationLevels: 0 }, E: { isLeader: false, duplicationLevels: 0 }, }; }
+        
+        // --- MASTER UPDATE FUNCTION (FIXED) ---
+        function updateUI() {
+            renderControls(); // Wajib: Gambar ulang tombol untuk update warna
+            updateSimulation(); // Update angka-angka
+        }
+
+        function handlePhase1Click(buttonName) { 
+            if (currentPhase !== 1) return; 
+            phase1ButtonsClicked[buttonName] = true; 
+            const btn = document.getElementById(`btn-${buttonName}`); 
+            if (btn) { btn.disabled = true; btn.classList.add('clicked'); } 
+            
+            const allClicked = Object.values(phase1ButtonsClicked).every(val => val === true); 
+            if (allClicked) { 
+                if (currentMemberIndex < members.length) { 
+                    const memberLetter = members[currentMemberIndex]; 
+                    currentMemberIndex++; 
+                    
+                    updateUI(); // Panggil updateUI agar warna hijau muncul
+
+                    if (currentMemberIndex < members.length) { 
+                        setTimeout(resetPhase1Buttons, 400); 
+                    } else { 
+                        currentPhase = 2; 
+                        document.getElementById('phase-1-buttons').classList.add('hidden'); 
+                        document.getElementById('phase-2-buttons').classList.remove('hidden'); 
+                        updateUI();
+                    } 
+                } 
+            } 
+        }
+
+        function resetPhase1Buttons() { 
+            phase1ButtonsClicked = { tanya: false, cerita: false, undang: false, jelaskan: false }; 
+            ['tanya', 'cerita', 'undang', 'jelaskan'].forEach(name => { 
+                const btn = document.getElementById(`btn-${name}`); 
+                if (btn) { btn.disabled = false; btn.classList.remove('clicked'); } 
+            }); 
+        }
+
+        function handlePhase2Click(buttonName) { 
+            if (currentPhase !== 2) return; 
+            phase2ButtonsClicked[buttonName] = true; 
+            const btn = document.getElementById(`btn-${buttonName}`); 
+            if (btn) { btn.disabled = true; btn.classList.add('clicked'); } 
+            
+            const allClicked = Object.values(phase2ButtonsClicked).every(val => val === true); 
+            if (allClicked) { 
+                if (currentBinaIndex < members.length) { 
+                    const memberLetter = members[currentBinaIndex]; 
+                    
+                    if (currentBinaIndex === 0) simulationMode = 'duplicating_lv1'; 
+                    
+                    memberState[memberLetter].isLeader = true; 
+                    memberState[memberLetter].duplicationLevels = 1; 
+                    
+                    // CRITICAL FIX: Panggil updateUI agar tombol langsung berubah Emas
+                    updateUI(); 
+                    
+                    currentBinaIndex++; 
+                    if (currentBinaIndex < members.length) { 
+                        setTimeout(resetPhase2Buttons, 400); 
+                    } else { 
+                        currentPhase = 3; 
+                        document.getElementById('phase-2-buttons').classList.add('hidden'); 
+                        document.getElementById('phase-3-buttons').classList.remove('hidden'); 
+                    } 
+                } 
+            } 
+        }
+
+        function resetPhase2Buttons() { 
+            phase2ButtonsClicked = { sapa: false, sharing: false, solusi: false, duplikasi: false }; 
+            ['sapa', 'sharing', 'solusi', 'duplikasi'].forEach(name => { 
+                const btn = document.getElementById(`btn-${name}`); 
+                if (btn) { btn.disabled = false; btn.classList.remove('clicked'); } 
+            }); 
+        }
+
+        function handlePhase3Click(buttonName) { 
+            if (currentPhase !== 3) return; 
+            phase3ButtonsClicked[buttonName] = true; 
+            const btnId = (buttonName === 'duplikasi') ? 'btn-duplikasi-level' : 'btn-edifikasi'; 
+            const btn = document.getElementById(btnId); 
+            if (btn) { btn.disabled = true; btn.classList.add('clicked'); } 
+            
+            const allClicked = Object.values(phase3ButtonsClicked).every(val => val === true); 
+            if (allClicked) { 
+                const { level, memberIndex } = currentDuplicationState; 
+                if (level > 4) return; 
+                const memberLetter = members[memberIndex]; 
+                memberState[memberLetter].duplicationLevels = level; 
+                
+                updateUI();
+
+                let newMemberIndex = memberIndex + 1; let newLevel = level; 
+                if (newMemberIndex >= members.length) { newMemberIndex = 0; newLevel = level + 1; } 
+                currentDuplicationState = { level: newLevel, memberIndex: newMemberIndex }; 
+                if (newLevel <= 4) { setTimeout(resetPhase3Buttons, 400); } 
+            } 
+        }
+
+        function resetPhase3Buttons() { 
+            phase3ButtonsClicked = { edifikasi: false, duplikasi: false }; 
+            const btnEd = document.getElementById('btn-edifikasi'); if(btnEd) { btnEd.disabled = false; btnEd.classList.remove('clicked'); } 
+            const btnDup = document.getElementById('btn-duplikasi-level'); if(btnDup) { btnDup.disabled = false; btnDup.classList.remove('clicked'); } 
+        }
+
+        function goBackOneStep() { 
+            stopConfetti(); 
+            const championsAudio = document.getElementById('champions-audio'); if (championsAudio) championsAudio.pause(); 
+            
+            if (currentPhase === 3) { 
+                let { level, memberIndex } = currentDuplicationState; 
+                let prevMemberIndex = memberIndex - 1; let prevLevel = level; 
+                if (prevMemberIndex < 0) { prevMemberIndex = 4; prevLevel = level - 1; } 
+                if (prevLevel < 2) { 
+                    currentPhase = 2; currentBinaIndex = 5; 
+                    document.getElementById('phase-3-buttons').classList.add('hidden'); 
+                    document.getElementById('phase-2-buttons').classList.remove('hidden'); 
+                    resetPhase2Buttons(); 
+                } else { 
+                    const memberToRevert = members[prevMemberIndex]; 
+                    memberState[memberToRevert].duplicationLevels = prevLevel - 1; 
+                    currentDuplicationState = { level: prevLevel, memberIndex: prevMemberIndex }; 
+                    resetPhase3Buttons(); updateUI(); 
+                } 
+            } else if (currentPhase === 2) { 
+                if (currentBinaIndex === 0) { 
+                    currentPhase = 1; currentMemberIndex = 5; simulationMode = 'recruit_lv1'; 
+                    document.getElementById('phase-2-buttons').classList.add('hidden'); 
+                    document.getElementById('phase-1-buttons').classList.remove('hidden'); 
+                    resetPhase1Buttons(); updateUI(); 
+                } else { 
+                    currentBinaIndex--; const memberToRevert = members[currentBinaIndex]; 
+                    memberState[memberToRevert].isLeader = false; memberState[memberToRevert].duplicationLevels = 0; 
+                    resetPhase2Buttons(); updateUI(); 
+                } 
+            } else if (currentPhase === 1) { 
+                if (currentMemberIndex > 0) { 
+                    currentMemberIndex--; 
+                    resetPhase1Buttons(); updateUI(); 
+                } 
+            } 
+        }
+
+        function initializeSimulator() { 
+            stopConfetti(); 
+            resetMemberState(); 
+            simulationMode = 'recruit_lv1'; 
+            phase1ButtonsClicked = { tanya: false, cerita: false, undang: false, jelaskan: false }; 
+            phase2ButtonsClicked = { sapa: false, sharing: false, solusi: false, duplikasi: false }; 
+            phase3ButtonsClicked = { edifikasi: false, duplikasi: false }; 
+            currentMemberIndex = 0; currentBinaIndex = 0; 
+            currentDuplicationState = { level: 2, memberIndex: 0 }; 
+            currentPhase = 1; 
+            document.getElementById('phase-1-buttons').classList.remove('hidden'); 
+            document.getElementById('phase-2-buttons').classList.add('hidden'); 
+            document.getElementById('phase-3-buttons').classList.add('hidden'); 
+            resetPhase1Buttons(); resetPhase2Buttons(); resetPhase3Buttons(); 
+            updateUI(); 
+        }
+
+        function renderControls() { 
+            const container = document.getElementById('controls-body'); if(!container) return; 
+            
+            let labelText = "MEMBANGUN TIM"; 
+            if (currentPhase > 1) labelText = "MEMBANGUN KETUA";
+            if (simulationMode === 'duplicating_lv1') labelText = "BINA KETUA TIM"; 
+            
+            // TOMBOL MEMBER
+            let checkboxHTML = members.map(letter => {
+                let dynamicClass = "";
+                const isLeader = memberState[letter].isLeader;
+                // Logika: Apakah dia sudah direkrut?
+                // Di Phase 1, tergantung urutan. Di Phase 2 dst, semua dianggap sudah direkrut.
+                const isRecruited = (currentPhase === 1) ? 
+                    (members.indexOf(letter) < currentMemberIndex) : true;
+
+                if (!isRecruited) {
+                    // KASUS 1: Belum Gabung (Abu-abu)
+                    dynamicClass = "bg-slate-700/50 border-slate-600 text-slate-400";
+                } else if (isLeader) {
+                    // KASUS 2: Sudah Jadi Ketua (Emas Menyala)
+                    dynamicClass = "bg-amber-400 text-slate-900 border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.6)] scale-105 transition-all duration-300";
+                } else {
+                    // KASUS 3: Sudah Gabung, Belum Ketua (Hijau)
+                    dynamicClass = "bg-emerald-500 text-white border-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]";
+                }
+
+                return `
+                <div class="flex flex-col items-center"> 
+                    <div id="kt-label-${letter}" class="h-3 w-full flex justify-center items-end text-[10px] mb-0.5"></div> 
+                    <input type="checkbox" id="member${letter}" class="hidden peer" disabled> 
+                    <label for="member${letter}" class="block h-12 w-12 rounded-lg border ${dynamicClass} font-bold text-lg flex items-center justify-center">${letter}</label> 
+                    <div class="mt-1 flex flex-col items-center space-y-0.5" id="duplication-tree-${letter}"></div> 
+                </div>`;
+            }).join('');
+            
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-3"> 
+                    <label id="controls-label" class="block font-bold text-slate-500 text-[9px] uppercase tracking-widest">${labelText}</label> 
+                    <button id="back-button" title="Kembali" class="text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 p-1.5 rounded-full transition-all" onclick="goBackOneStep()"> 
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"> <path fill-rule="evenodd" d="M15 10a.75.75 0 0 1-.75.75H7.56l2.22 2.22a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 1.06L7.56 9.25H14.25A.75.75 0 0 1 15 10Z" clip-rule="evenodd" /> </svg> 
+                    </button> 
+                </div> 
+                <div class="grid grid-cols-5 gap-3 px-0.5"> ${checkboxHTML} </div>
+            `; 
+            
+            // Render Crown Icon Logic
+            if (simulationMode === 'duplicating_lv1') { 
+                Object.entries(memberState).forEach(([letter, member]) => { 
+                    const label = document.getElementById(`kt-label-${letter}`); 
+                    if(label) label.innerHTML = member.isLeader ? `<span class="text-xs filter drop-shadow-[0_0_2px_rgba(251,191,36,0.8)]">👑</span>` : ''; 
+                }); 
+            }
+            
+            renderDuplicationTree(); 
+        }
+
+        function renderDuplicationTree() { 
+            Object.entries(memberState).forEach(([letter, member]) => { 
+                const treeContainer = document.getElementById(`duplication-tree-${letter}`); 
+                if (treeContainer) { 
+                    treeContainer.innerHTML = ''; 
+                    if (member.isLeader) { 
+                        for (let i = 1; i <= member.duplicationLevels; i++) { 
+                            const numberValue = 5 ** i; 
+                            const numberDiv = document.createElement('div'); 
+                            
+                            // PERBAIKAN UKURAN FONT & VISIBILITAS DISINI
+                            // 1. Text size naik dari 7px -> 11px (text-[11px])
+                            // 2. Warna teks jadi Putih Terang (text-white)
+                            // 3. Background lebih kontras (bg-slate-900)
+                            // 4. Tambahan margin & padding agar rapi
+                            numberDiv.className = "min-w-[28px] text-center text-[11px] font-bold text-white bg-slate-900 border border-slate-700 py-0.5 rounded shadow-sm mt-1";
+                            
+                            numberDiv.textContent = numberValue.toLocaleString('id-ID'); 
+                            treeContainer.appendChild(numberDiv); 
+                        } 
+                    } 
+                } 
+            }); 
+        }
+
+        const confettiCanvas = document.getElementById('confetti-canvas'); const confettiCtx = confettiCanvas ? confettiCanvas.getContext('2d') : null; let confettiPieces = []; const confettiColors = ['#fde68a', '#facc15', '#eab308', '#d97706'];
+        function startConfetti() { if (confettiInterval || !confettiCanvas) return; confettiCanvas.style.display = 'block'; confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; confettiInterval = setInterval(() => { for (let i = 0; i < 20; i++) { createConfetti(); } }, 500); animateConfetti(); }
+        function stopConfetti() { if (!confettiInterval) return; clearInterval(confettiInterval); confettiInterval = null; cancelAnimationFrame(animationFrameId); animationFrameId = null; setTimeout(() => { if (confettiCanvas && confettiCtx) { confettiCanvas.style.display = 'none'; confettiPieces = []; confettiCtx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height); } }, 3000); }
+        function createConfetti() { if(confettiCanvas) confettiPieces.push({ x: Math.random() * confettiCanvas.width, y: -20, w: 5 + Math.random() * 10, h: 10 + Math.random() * 10, color: confettiColors[Math.floor(Math.random() * confettiColors.length)], rotation: Math.random() * 360, speedX: Math.random() * 4 - 2, speedY: 2 + Math.random() * 3, opacity: 1 }); }
+        function animateConfetti() { if (!confettiCtx || !confettiCanvas) return; animationFrameId = requestAnimationFrame(animateConfetti); confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); confettiPieces.forEach((piece, index) => { piece.y += piece.speedY; piece.x += piece.speedX; piece.rotation += piece.speedX; piece.opacity -= 0.005; if (piece.y > confettiCanvas.height || piece.opacity <= 0) { confettiPieces.splice(index, 1); } else { confettiCtx.save(); confettiCtx.translate(piece.x, piece.y); confettiCtx.rotate(piece.rotation * Math.PI / 180); confettiCtx.globalAlpha = piece.opacity; confettiCtx.fillStyle = piece.color; confettiCtx.fillRect(-piece.w / 2, -piece.h / 2, piece.w, piece.h); confettiCtx.restore(); } }); }
+
+        function updateSimulation() { 
+            if (simulationMode === 'duplicating_lv1') { 
+                anggotaLevels[0] = 5; anggotaLevels.fill(0, 1); 
+                Object.values(memberState).forEach(member => { 
+                    if (member.isLeader) { 
+                        if (member.duplicationLevels >= 1) anggotaLevels[1] += 5; 
+                        if (member.duplicationLevels >= 2) anggotaLevels[2] += 25; 
+                        if (member.duplicationLevels >= 3) anggotaLevels[3] += 125; 
+                        if (member.duplicationLevels >= 4) anggotaLevels[4] += 625; 
+                    } 
+                }); 
+            } else { anggotaLevels[0] = currentMemberIndex; anggotaLevels.fill(0, 1); } 
+            
+            const totalAnggotaTim = anggotaLevels.reduce((a, b) => a + b, 0); const totalAnggota = totalAnggotaTim + 1; const depositAwal = 100; 
+            const bonusTim = anggotaLevels[0] >= 5 ? 20 : 0; 
+            
+            let cumulativeBonusPeringkat = 0; if (anggotaLevels[0] >= 5) cumulativeBonusPeringkat += 50; if (totalAnggota >= 31) cumulativeBonusPeringkat += 100; if (totalAnggota >= 101) cumulativeBonusPeringkat += 200; if (totalAnggota >= 201) cumulativeBonusPeringkat += 400; if (totalAnggota >= 351) cumulativeBonusPeringkat += 600; if (totalAnggota >= 501) cumulativeBonusPeringkat += 1000; if (totalAnggota >= 901) cumulativeBonusPeringkat += 2000; if (totalAnggota >= 1601) cumulativeBonusPeringkat += 3000; if (totalAnggota >= 3501) cumulativeBonusPeringkat += 5000;
+            
+            let status = "ANGGOTA", statusColor = "text-slate-400 bg-slate-800 border-slate-700", bonusPeringkatForDisplay = 0; 
+            if (totalAnggota >= 3501) { status = "VIP 9"; statusColor = "text-violet-300 bg-violet-900/50 border-violet-500/50"; bonusPeringkatForDisplay = 5000;} else if (totalAnggota >= 1601) { status = "VIP 8"; statusColor = "text-violet-300 bg-violet-900/50 border-violet-500/50"; bonusPeringkatForDisplay = 3000;} else if (totalAnggota >= 901) { status = "VIP 7"; statusColor = "text-indigo-300 bg-indigo-900/50 border-indigo-500/50"; bonusPeringkatForDisplay = 2000;} else if (totalAnggota >= 501) { status = "VIP 6"; statusColor = "text-indigo-300 bg-indigo-900/50 border-indigo-500/50"; bonusPeringkatForDisplay = 1000;} else if (totalAnggota >= 351) { status = "VIP 5"; statusColor = "text-blue-300 bg-blue-900/50 border-blue-500/50"; bonusPeringkatForDisplay = 600;} else if (totalAnggota >= 201) { status = "VIP 4"; statusColor = "text-blue-300 bg-blue-900/50 border-blue-500/50"; bonusPeringkatForDisplay = 400;} else if (totalAnggota >= 101) { status = "VIP 3"; statusColor = "text-cyan-300 bg-cyan-900/50 border-cyan-500/50"; bonusPeringkatForDisplay = 200;} else if (totalAnggota >= 31) { status = "VIP 2"; statusColor = "text-cyan-300 bg-cyan-900/50 border-cyan-500/50"; bonusPeringkatForDisplay = 100;} else if (anggotaLevels[0] >= 5) { status = "VIP 1"; statusColor = "text-emerald-300 bg-emerald-900/50 border-emerald-500/50"; bonusPeringkatForDisplay = 50;}
+            
+            const totalBonus = bonusTim + cumulativeBonusPeringkat; const saldoAkun = depositAwal + totalBonus; 
+            
+            function getMemberContribution(level) { if (level === 0) return 30; return 500 + (5 * getMemberContribution(level - 1)); }
+            let batasanModal = 500; 
+            if (simulationMode === 'recruit_lv1') { batasanModal += anggotaLevels[0] * 30; } 
+            else { Object.values(memberState).forEach(member => { if (member.isLeader) { batasanModal += getMemberContribution(member.duplicationLevels); } else { batasanModal += 30; } }); }
+
+            let sinyalKe3 = "Tidak Aktif"; const isALeader = memberState.A.isLeader; const isBLeader = memberState.B.isLeader; const isCLeader = memberState.C.isLeader; const isDLeader = memberState.D.isLeader; const isELeader = memberState.E.isLeader; const andaIsVip1 = (anggotaLevels[0] >= 5);
+            if (andaIsVip1) { 
+                if (isALeader && isBLeader && isCLeader && isDLeader && isELeader) { sinyalKe3 = "Permanen"; } 
+                else if (isBLeader && isDLeader) { sinyalKe3 = "Tidak Aktif"; } 
+                else if (isALeader && isBLeader && isCLeader) { sinyalKe3 = "20 Hari"; } 
+                else if ((!isALeader && !isBLeader && !isCLeader && !isDLeader && !isELeader) || (isALeader  && !isBLeader && !isCLeader && !isDLeader && !isELeader)) { sinyalKe3 = "5 Hari"; } 
+            }
+            let sinyalKe4 = "Belum Aktif"; if (anggotaLevels[1] > 0) { sinyalKe4 = "10 Hari"; } 
+            let bonusVolume = "0%"; if (anggotaLevels[0] >= 5) { if (totalAnggota >= 3501) bonusVolume = "5%"; else if (totalAnggota >= 1601) bonusVolume = "3.5%"; else if (totalAnggota >= 901) bonusVolume = "3%"; else if (totalAnggota >= 501) bonusVolume = "2.5%"; else if (totalAnggota >= 351) bonusVolume = "2%"; else if (totalAnggota >= 201) bonusVolume = "1.5%"; else if (totalAnggota >= 101) bonusVolume = "1%"; else if (totalAnggota >= 31) bonusVolume = "0.5%"; else if (totalAnggota >= 5) bonusVolume = "0.3%"; }
+            
+            const isVip9 = status === "VIP 9"; const juaraMsg = document.getElementById('juara-message-container'); const fokusMsg = document.getElementById('fokus-message'); const championsAudio = document.getElementById('champions-audio');
+            if (isVip9) { 
+                startConfetti(); if(juaraMsg) juaraMsg.classList.remove('hidden'); if(fokusMsg) fokusMsg.classList.add('hidden'); 
+                if (championsAudio && championsAudio.paused) { championsAudio.currentTime = 0; championsAudio.loop = true; championsAudio.play().catch(e => {console.error("Champions Audio play failed:", e)}); } 
+            } else { 
+                stopConfetti(); if(juaraMsg) juaraMsg.classList.add('hidden'); if(fokusMsg) fokusMsg.classList.remove('hidden'); 
+                if (championsAudio && !championsAudio.paused) { championsAudio.pause(); championsAudio.currentTime = 0; } 
+            }
+            
+            const andaLbl = document.getElementById('anda-label'); const ktLbl = document.getElementById('ketua-tim-label'); const crownIcn = document.getElementById('crown-icon'); 
+            if (anggotaLevels[0] >= 5) { 
+                if(andaLbl){andaLbl.className = "bg-amber-400 text-slate-900 border border-amber-300 font-bold text-[10px] uppercase px-3 py-0.5 rounded-md tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.5)]";} 
+                if(ktLbl) ktLbl.innerHTML = `<span class="text-[8px] font-bold text-amber-400 uppercase tracking-widest bg-amber-900/30 px-1.5 py-0.5 rounded border border-amber-500/20">Ketua Tim</span>`; 
+                if(crownIcn) crownIcn.classList.remove('hidden'); 
+            } else { 
+                if(andaLbl){andaLbl.className = "bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold text-[10px] uppercase px-3 py-0.5 rounded-md tracking-wider";} 
+                if(ktLbl) ktLbl.innerHTML = ''; if(crownIcn) crownIcn.classList.add('hidden'); 
+            } 
+            
+            // PERBAIKAN: Update teks sesuai permintaan user (@300 USDT, 20 USDT)
+            const elRef1=document.getElementById('resBonusReveral1'); if(elRef1) elRef1.textContent=`@300 USDT`; 
+            const elRef2=document.getElementById('resBonusReveral2'); if(elRef2) elRef2.textContent=`@300 USDT`; 
+            const elBonusTim=document.getElementById('resBonusTim'); if(elBonusTim) elBonusTim.textContent=`20 USDT`; 
+            
+            // Update elemen lain
+            const elTotalBonus=document.getElementById('kpiTotalBonus'); if(elTotalBonus) elTotalBonus.textContent=`+${totalBonus.toLocaleString('id-ID')} USDT`; 
+            const elKpiStatus=document.getElementById('kpiStatus'); if(elKpiStatus) elKpiStatus.innerHTML=`<span class="px-2 py-0.5 rounded font-bold text-[10px] uppercase tracking-widest ${statusColor} border shadow-sm">${status}</span>`; 
+            const elBonusPeringkat=document.getElementById('kpiBonusPeringkat'); if(elBonusPeringkat) elBonusPeringkat.textContent=bonusPeringkatForDisplay>0?`+${bonusPeringkatForDisplay.toLocaleString('id-ID')} USDT`:''; 
+            const elBonusVol=document.getElementById('resBonusVolume'); if(elBonusVol) elBonusVol.textContent=bonusVolume; 
+            const elSaldo=document.getElementById('resModalAwalPanel'); if(elSaldo) elSaldo.textContent=`${saldoAkun.toLocaleString('id-ID')} USDT`; 
+            
+            const elBatas=document.getElementById('resBatasanModal'); if(elBatas) elBatas.textContent=`${batasanModal.toLocaleString('id-ID')}`; 
+            const elTotalAnggota=document.getElementById('resTotalAnggotaPanel'); if(elTotalAnggota) elTotalAnggota.textContent=`${totalAnggotaTim.toLocaleString('id-ID')}`; 
+            
+            const check = `<svg class="inline-block h-3.5 w-3.5 mr-1.5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>`; const cross = `<svg class="inline-block h-3.5 w-3.5 mr-1.5 text-slate-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>`;
+            const sinyalSSM = `<div class="text-xs text-emerald-300 font-medium flex items-center justify-between"><span class="flex items-center">${check}<span>Siang & Malam</span></span><span class="text-[10px] text-emerald-500 uppercase tracking-wider">Aktif</span></div>`; 
+            const sinyal3 = `<div class="text-xs ${sinyalKe3 !== 'Tidak Aktif' ? 'text-emerald-300' : 'text-slate-500'} font-medium flex items-center justify-between"> <span class="flex items-center"> ${sinyalKe3 !== 'Tidak Aktif' ? check : cross} <span>Sinyal ke-3</span> </span> <span class="text-[10px] uppercase tracking-wider opacity-80">${sinyalKe3}</span> </div>`; 
+            const sinyal4 = `<div class="text-xs ${sinyalKe4 !== 'Belum Aktif' ? 'text-emerald-300' : 'text-slate-500'} font-medium flex items-center justify-between"> <span class="flex items-center"> ${sinyalKe4 !== 'Belum Aktif' ? check : cross} <span>Sinyal ke-4</span> </span> <span class="text-[10px] uppercase tracking-wider opacity-80">${sinyalKe4}</span> </div>`; 
+            const sinyalContainer = document.getElementById('sinyalContainer'); if (sinyalContainer) sinyalContainer.innerHTML = sinyalSSM + sinyal3 + sinyal4;
+            
+            function pulseElement(id) { const el = document.getElementById(id); if (el) { el.classList.add('number-pulse'); setTimeout(() => { el.classList.remove('number-pulse'); }, 400); } }
+            pulseElement('kpiTotalBonus'); pulseElement('resModalAwalPanel');
+        }
+
+        // --- Init Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const enterButton = document.getElementById('enter-button');
+            const splashScreen = document.getElementById('splash-screen');
+            const dashboardContent = document.getElementById('dashboard-content');
+            
+            enterButton.addEventListener('click', () => {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) elem.requestFullscreen().catch(err => {}); 
+                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                
+                splashScreen.style.animation = 'fadeOut 0.5s ease-out forwards'; 
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                    dashboardContent.classList.remove('hidden');
+                    dashboardContent.style.animation = 'fadeIn 0.5s ease-out forwards'; 
+                    initializeSimulator(); 
+                }, 500);
+            });
+            
+            if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/BenefitPlan/sw.js'); }); }
+            const audioButton = document.getElementById('play-audio-button'); const audio = document.getElementById('tutorial-audio');
+            const speakerIcon = document.getElementById('speaker-icon'); const speakerOffIcon = document.getElementById('speaker-off-icon');
+            if (audioButton && audio) { 
+                audioButton.addEventListener('click', () => { 
+                    const championsAudio = document.getElementById('champions-audio');
+                    if (championsAudio && !championsAudio.paused) { championsAudio.pause(); championsAudio.currentTime = 0; }
+                    if (audio.paused) audio.play().catch(e => {}); else audio.pause(); 
+                });
+                audio.onplay = () => { speakerIcon.classList.add('hidden'); speakerOffIcon.classList.remove('hidden'); };
+                audio.onpause = () => { speakerIcon.classList.remove('hidden'); speakerOffIcon.classList.add('hidden'); };
+            }
+        });
+    </script>
+</body>
+</html>
