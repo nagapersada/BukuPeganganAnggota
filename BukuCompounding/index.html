@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Compound">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png"> 
+    
+    <title>Compound - Kalkulator Aset</title>
+    <style>
+        /* === FONT PENGGANTI TRANSSANS (MONTSERRAT) === */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-deep: #000000;
+            --glass-panel: rgba(20, 20, 20, 0.95);
+            
+            /* WARNA EMAS */
+            --gold-primary: #D4AF37; 
+            --gold-bright: #FFD700;  /* Emas Terang untuk Simbol */
+            --gold-gradient: linear-gradient(90deg, #BF953F, #FCF6BA, #B38728, #FBF5B7);
+            
+            --text-primary: #ffffff;
+            --text-secondary: #999999;
+            --border-thin: 1px solid rgba(212, 175, 55, 0.15);
+            --profit-green: #2ecc71;
+            
+            --font-main: 'Montserrat', sans-serif;
+        }
+
+        /* === RESET & ANTI-COPY POPUP === */
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            
+            /* MATIKAN POPUP MENU BAWAAN HP */
+            -webkit-touch-callout: none !important; 
+            user-select: none !important; 
+            -webkit-user-select: none !important;
+        }
+        
+        /* Kecualikan Input agar tetap bisa diketik */
+        input {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+        
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: var(--font-main);
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            overflow: hidden; 
+            position: fixed;
+        }
+
+        /* === SLIDE ANIMATIONS === */
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s;
+            overflow-y: auto; overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 1rem;
+            display: flex; flex-direction: column;
+        }
+
+        /* === SLIDE 1: WELCOME === */
+        #slide1 {
+            justify-content: center; align-items: center; text-align: center;
+            background: radial-gradient(circle at 50% 30%, rgba(30,30,30,1) 0%, rgba(0,0,0,1) 100%);
+            z-index: 10;
+        }
+        #slide1 .logo { width: 130px; margin-bottom: 2rem; filter: drop-shadow(0 0 25px rgba(212,175,55,0.25)); }
+        #slide1 h1 {
+            font-size: 2.2rem; font-weight: 800; 
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 0 0 1rem 0; letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        #slide1 p { color: var(--text-secondary); max-width: 85%; line-height: 1.6; font-weight: 500; margin-bottom: 3rem; font-size: 0.95rem; }
+
+        /* === SLIDE 2: CALCULATOR === */
+        #slide2 {
+            background: #000;
+            transform: translateX(100%); opacity: 0; pointer-events: none;
+            padding-top: 4rem; 
+            padding-bottom: 2rem;
+        }
+
+        body.kalkulator-aktif #slide1 { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+        body.kalkulator-aktif #slide2 { transform: translateX(0); opacity: 1; pointer-events: auto; }
+
+        /* === UI COMPONENTS === */
+        .container { width: 100%; max-width: 600px; margin: 0 auto; }
+
+        h2 {
+            text-align: center; font-weight: 700;
+            font-size: 1.5rem; letter-spacing: 1px;
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 0 0 0.5rem 0; text-transform: uppercase;
+        }
+
+        .rate-display {
+            text-align: center; color: var(--text-secondary);
+            font-size: 0.8rem; margin-bottom: 2rem; font-weight: 500;
+            border-bottom: var(--border-thin); padding-bottom: 1rem;
+            width: 85%; margin-left: auto; margin-right: auto;
+        }
+
+        /* === FORM GRID SYSTEM === */
+        .form-group { margin-bottom: 1.2rem; }
+        
+        label {
+            display: block; font-size: 0.7rem; color: var(--gold-primary);
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.6rem;
+            font-weight: 700; 
+        }
+
+        input[type="number"] {
+            width: 100%; background: rgba(255,255,255,0.05);
+            border: 1px solid #333; border-radius: 8px;
+            padding: 1rem; color: #fff; font-family: var(--font-main);
+            font-size: 1.1rem; font-weight: 600; 
+            outline: none; transition: border 0.3s;
+        }
+        input[type="number"]:focus { border-color: var(--gold-primary); background: rgba(255,255,255,0.08); }
+
+        /* CHECKBOX GRID */
+        .checkbox-wrapper {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.5rem;
+        }
+        
+        .check-item {
+            display: flex; align-items: center; gap: 0.8rem;
+            background: rgba(255,255,255,0.03);
+            padding: 0.9rem; border-radius: 8px;
+            border: 1px solid transparent; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .check-item:active { background: rgba(212,175,55,0.15); }
+
+        input[type="checkbox"] {
+            appearance: none; width: 22px; height: 22px;
+            border: 2px solid #555; border-radius: 6px;
+            display: grid; place-content: center; margin: 0;
+            transition: all 0.2s;
+        }
+        input[type="checkbox"]::before {
+            content: ""; width: 12px; height: 12px; transform: scale(0);
+            background: var(--gold-primary); border-radius: 2px;
+            transition: 120ms transform ease-in-out;
+        }
+        input[type="checkbox"]:checked { border-color: var(--gold-primary); }
+        input[type="checkbox"]:checked::before { transform: scale(1); }
+        
+        .check-label { font-size: 0.85rem; color: #eee; font-weight: 600; }
+
+        /* === BUTTONS === */
+        .btn-action {
+            width: 100%; margin-top: 2rem; padding: 1.2rem;
+            background: var(--gold-gradient);
+            border: none; border-radius: 12px; 
+            color: #000; font-weight: 800; font-size: 1rem; font-family: var(--font-main);
+            letter-spacing: 1px; text-transform: uppercase;
+            box-shadow: 0 5px 30px rgba(212, 175, 55, 0.2);
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+        .btn-action:active { transform: scale(0.98); }
+
+        .btn-back {
+            position: absolute; top: 1rem; left: 1rem;
+            background: rgba(0,0,0,0.5); border: 1px solid #444;
+            backdrop-filter: blur(5px);
+            color: var(--text-secondary); padding: 0.6rem 1.2rem;
+            border-radius: 30px; font-size: 0.8rem; z-index: 20;
+            display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
+            font-family: var(--font-main); font-weight: 600;
+        }
+
+        /* === TABLE === */
+        .table-wrap {
+            margin-top: 2.5rem; overflow-x: auto;
+            border-radius: 12px; border: var(--border-thin);
+            background: rgba(15,15,15,0.6);
+        }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        
+        th {
+            background: #111; color: var(--gold-primary);
+            padding: 1.2rem 1rem; font-size: 0.7rem; text-transform: uppercase;
+            border-bottom: 1px solid #333; letter-spacing: 0.5px;
+            position: sticky; top: 0; z-index: 5; font-weight: 700;
+        }
+        td {
+            padding: 1.1rem 1rem; border-bottom: 1px solid #222;
+            font-variant-numeric: tabular-nums; font-size: 0.95rem; font-weight: 500;
+            text-align: right;
+        }
+        
+        /* Sticky First Column */
+        th:first-child, td:first-child {
+            position: sticky; left: 0; z-index: 6;
+            text-align: center; border-right: 1px solid #333;
+        }
+        th:first-child { background: #111; }
+        td:first-child { background: #0a0a0a; color: var(--text-secondary); font-weight: 600; }
+
+        .profit { color: var(--profit-green); font-weight: 600; }
+        
+        /* WARNA SIMBOL DOLLAR EMAS TERANG */
+        .currency-symbol { 
+            color: var(--gold-bright); 
+            font-weight: 700; 
+            margin-right: 2px; 
+            font-size: 1em;
+        }
+
+        td.pressing { background: var(--gold-primary) !important; color: #000 !important; }
+        td.pressing .currency-symbol { color: #000 !important; }
+
+        /* === MODAL === */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-box {
+            background: #111; border: 1px solid var(--gold-primary);
+            padding: 2.5rem; border-radius: 20px; text-align: center;
+            min-width: 300px; transform: scale(0.9); transition: 0.3s;
+            box-shadow: 0 0 50px rgba(212,175,55,0.15);
+        }
+        .modal.active .modal-box { transform: scale(1); }
+        .modal-val-usd { 
+            color: var(--gold-bright); 
+            font-size: 2.2rem; margin: 0; font-weight: 700;
+            letter-spacing: -1px;
+        }
+        .modal-val-idr { color: #fff; font-size: 1.1rem; margin-top: 0.8rem; font-weight: 500; }
+        .modal-close { position: absolute; top: 15px; right: 20px; color: #666; font-size: 1.8rem; cursor: pointer; }
+
+    </style>
+</head>
+<body>
+
+    <div id="slide1" class="slide">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>Strategi Aset</h1>
+        <p>Kekayaan sejati dibangun dari konsistensi, bukan kecepatan. Temukan potensi Anda sekarang.</p>
+        <button class="btn-action" style="max-width: 250px;" onclick="toggleApp(true)">Mulai Simulasi</button>
+    </div>
+
+    <div id="slide2" class="slide">
+        <button class="btn-back" onclick="toggleApp(false)">← Kembali</button>
+        
+        <div class="container">
+            <h2>Proyeksi Dana</h2>
+            <div id="kursDisplay" class="rate-display">Memuat Kurs Pasar...</div>
+
+            <div class="form-group">
+                <label>Modal Awal (USDT)</label>
+                <input type="number" id="modal" value="100" inputmode="decimal">
+            </div>
+
+            <div class="form-group">
+                <label>Durasi (Hari)</label>
+                <input type="number" id="targetHari" value="41" inputmode="numeric">
+            </div>
+
+            <div class="form-group">
+                <label>Target Profit (%)</label>
+                <input type="number" id="bep" value="0.85" inputmode="decimal">
+            </div>
+
+            <div class="form-group" style="margin-top: 2rem;">
+                <label style="text-align: center; margin-bottom: 1rem;">Sesi Aktif</label>
+                <div class="checkbox-wrapper">
+                    <label class="check-item">
+                        <input type="checkbox" id="siang" checked>
+                        <span class="check-label">Sesi Siang</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" id="sinyal4">
+                        <span class="check-label">Sinyal 4</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" id="sinyal3">
+                        <span class="check-label">Sinyal 3</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" id="malam" checked>
+                        <span class="check-label">Sesi Malam</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="hitungCompounding()">HITUNG POTENSI</button>
+
+            <div class="table-wrap">
+                <table id="hasilTabel">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <div style="height: 100px;"></div>
+        </div>
+    </div>
+
+    <div id="konversiModal" class="modal">
+        <div class="modal-box">
+            <span id="modalClose" class="modal-close">&times;</span>
+            <div id="modalUsdValue" class="modal-val-usd"></div>
+            <div id="modalIdrValue" class="modal-val-idr"></div>
+        </div>
+    </div>
+
+    <script>
+        // === SCRIPT KHUSUS MEMATIKAN KLIK KANAN / MENU CONTEXT ===
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // === STATE & UTILS ===
+        let liveKurs = 16300;
+
+        function toggleApp(showCalc) {
+            if(showCalc) document.body.classList.add('kalkulator-aktif');
+            else document.body.classList.remove('kalkulator-aktif');
+        }
+
+        const fmtUSD = (n) => {
+            return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        };
+        const fmtIDR = (n) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n);
+        };
+
+        // === API & LOGIC ===
+        async function initApp() {
+            const disp = document.getElementById('kursDisplay');
+            try {
+                const req = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=idr');
+                const res = await req.json();
+                liveKurs = res.tether.idr;
+                disp.innerHTML = `Kurs Global: 1 USDT = ${fmtIDR(liveKurs)}`;
+                disp.style.color = '#999';
+            } catch (e) {
+                disp.innerHTML = `Kurs Offline: 1 USDT = ${fmtIDR(liveKurs)}`;
+                disp.style.color = '#aa4444';
+            }
+            hitungCompounding();
+        }
+
+        function hitungCompounding() {
+            const modalAwal = parseFloat(document.getElementById('modal').value) || 0;
+            const hari = parseInt(document.getElementById('targetHari').value) || 1;
+            const bep = parseFloat(document.getElementById('bep').value) / 100 || 0;
+            
+            const opts = {
+                siang: document.getElementById('siang').checked,
+                s4: document.getElementById('sinyal4').checked,
+                s3: document.getElementById('sinyal3').checked,
+                malam: document.getElementById('malam').checked
+            };
+
+            const thead = document.querySelector('#hasilTabel thead');
+            const tbody = document.querySelector('#hasilTabel tbody');
+            
+            let h = '<tr><th>Hari</th><th>Awal</th>';
+            if(opts.siang) h += '<th>Siang</th>';
+            if(opts.s4) h += '<th>Sinyal 4</th>';
+            if(opts.s3) h += '<th>Sinyal 3</th>';
+            if(opts.malam) h += '<th>Malam</th>';
+            h += '<th>Akhir</th><th>Total Profit</th></tr>';
+            thead.innerHTML = h;
+
+            tbody.innerHTML = '';
+            let saldo = modalAwal;
+            let totalProfit = 0;
+
+            for(let i=1; i<=hari; i++) {
+                let start = saldo;
+                let dailyP = 0;
+                
+                const calc = (cond) => {
+                    if(!cond) return 0;
+                    const p = saldo * bep;
+                    saldo += p;
+                    return p;
+                };
+
+                const p1 = calc(opts.siang);
+                const p2 = calc(opts.s4);
+                const p3 = calc(opts.s3);
+                const p4 = calc(opts.malam);
+
+                const end = saldo;
+                const gain = end - start;
+                totalProfit += gain;
+
+                let r = `<tr>
+                    <td>${i}</td>
+                    <td data-val="${start}">${fmtHtml(start)}</td>`;
+                
+                if(opts.siang) r += `<td class="profit" data-val="${p1}">${fmtHtml(p1)}</td>`;
+                if(opts.s4) r += `<td class="profit" data-val="${p2}">${fmtHtml(p2)}</td>`;
+                if(opts.s3) r += `<td class="profit" data-val="${p3}">${fmtHtml(p3)}</td>`;
+                if(opts.malam) r += `<td class="profit" data-val="${p4}">${fmtHtml(p4)}</td>`;
+
+                r += `<td data-val="${end}">${fmtHtml(end)}</td>
+                      <td class="profit" data-val="${totalProfit}">${fmtHtml(totalProfit)}</td>
+                </tr>`;
+                tbody.insertAdjacentHTML('beforeend', r);
+            }
+        }
+
+        function fmtHtml(val) {
+            return `<span class="currency-symbol">$</span>${fmtUSD(val)}`;
+        }
+
+        // === INTERACTION HANDLERS ===
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            const modal = document.getElementById('konversiModal');
+            const close = document.getElementById('modalClose');
+            const showModal = (usd) => {
+                document.getElementById('modalUsdValue').innerHTML = `<span class="currency-symbol" style="color:var(--gold-bright); font-size:0.8em;">$</span>${fmtUSD(usd)}`;
+                document.getElementById('modalIdrValue').innerText = fmtIDR(usd * liveKurs);
+                modal.classList.add('active');
+            };
+            
+            close.onclick = () => modal.classList.remove('active');
+            modal.onclick = (e) => { if(e.target === modal) modal.classList.remove('active'); };
+
+            const tbody = document.querySelector('tbody');
+            let timer = null, pressed = null, startX=0, startY=0;
+            const inputModal = document.getElementById('modal'); 
+
+            const start = (e) => {
+                const cell = e.target.closest('td');
+                if(!cell || !cell.hasAttribute('data-val')) return;
+                
+                const row = cell.parentElement;
+                const isEndCap = cell === row.children[row.children.length-2];
+
+                if(e.type === 'touchstart') {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                }
+
+                pressed = cell;
+                timer = setTimeout(() => {
+                    if(pressed && isEndCap) {
+                        pressed.classList.add('pressing');
+                        const val = parseFloat(pressed.getAttribute('data-val'));
+                        inputModal.value = val.toFixed(2);
+                        hitungCompounding(); 
+                        
+                        inputModal.style.borderColor = 'var(--gold-primary)';
+                        setTimeout(() => inputModal.style.borderColor = '#333', 500);
+                        
+                        pressed = null; 
+                    }
+                }, 600);
+            };
+
+            const move = (e) => {
+                if(!timer) return;
+                const t = e.touches[0];
+                if(Math.abs(t.clientX - startX) > 10 || Math.abs(t.clientY - startY) > 10) {
+                    clearTimeout(timer); timer = null;
+                }
+            };
+
+            const end = (e) => {
+                if(timer) {
+                    clearTimeout(timer);
+                    if(pressed) {
+                        const val = parseFloat(pressed.getAttribute('data-val'));
+                        showModal(val);
+                    }
+                }
+                if(pressed) pressed.classList.remove('pressing');
+                pressed = null;
+            };
+
+            tbody.addEventListener('mousedown', start);
+            tbody.addEventListener('touchstart', start, {passive:false});
+            tbody.addEventListener('touchmove', move, {passive:false});
+            tbody.addEventListener('mouseup', end);
+            tbody.addEventListener('touchend', end);
+        });
+
+    </script>
+</body>
+</html>
