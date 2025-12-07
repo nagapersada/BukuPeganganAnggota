@@ -216,6 +216,37 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 99999;">
+    <a href="../index.html" style="
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        /* Background Transparan Gelap dengan Blur */
+        background-color: rgba(0, 0, 0, 0.4); 
+        color: #ffffff; /* Tulisan Putih agar jelas */
+        padding: 8px 16px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 12px;
+        /* Border tipis transparan agar elegan */
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    " 
+    onmouseover="this.style.backgroundColor='rgba(0,0,0,0.7)'; this.style.transform='scale(1.05)';" 
+    onmouseout="this.style.backgroundColor='rgba(0,0,0,0.4)'; this.style.transform='scale(1)';"
+    >
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75l9-7.5 9 7.5M21 21H3M5.25 21V9.75m13.5 11.25V9.75m-9 11.25h9"></path>
+        </svg>
+        MENU UTAMA
+    </a>
+</div>
+
 </body>
 </html>
 
