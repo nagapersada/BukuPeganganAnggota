@@ -61,5 +61,138 @@
                 });
         }
     </script>
+    <div id="smart-menu-container" style="
+    position: fixed; 
+    top: 100px; 
+    right: 0; 
+    z-index: 99999;
+    touch-action: none; /* Mencegah scroll layar saat geser tombol */
+    transition: right 0.3s ease, left 0.3s ease; /* Animasi magnet */
+">
+    <div id="smart-menu-btn" style="
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background-color: rgba(0, 0, 0, 0.5); /* Hitam Transparan */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-right: none; /* Agar terlihat menyatu dengan pinggir */
+        border-radius: 50px 0 0 50px; /* Lengkung di sisi dalam */
+        padding: 10px 16px 10px 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        cursor: grab;
+        color: white;
+        font-family: sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        user-select: none;
+        white-space: nowrap;
+    ">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        MENU
+    </div>
+</div>
+
+<script>
+    (function() {
+        const container = document.getElementById('smart-menu-container');
+        const btn = document.getElementById('smart-menu-btn');
+        let isDragging = false;
+        let startX, startY, initialTop;
+        let hasMoved = false;
+
+        // URL Tujuan (Mundur satu folder ke index.html utama)
+        const targetUrl = "../index.html"; 
+
+        // Event Listeners untuk Touch (HP)
+        container.addEventListener('touchstart', dragStart, {passive: false});
+        document.addEventListener('touchmove', dragMove, {passive: false});
+        document.addEventListener('touchend', dragEnd);
+
+        // Event Listeners untuk Mouse (PC/Test)
+        container.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) {
+            isDragging = true;
+            hasMoved = false;
+            
+            // Ambil posisi awal
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            initialTop = container.offsetTop;
+            startY = clientY;
+
+            // Matikan transisi saat digeser agar responsif
+            container.style.transition = 'none';
+            btn.style.cursor = 'grabbing';
+        }
+
+        function dragMove(e) {
+            if (!isDragging) return;
+            
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            
+            // Cek apakah benar-benar digeser (untuk membedakan klik)
+            if (Math.abs(clientY - startY) > 5) hasMoved = true;
+
+            e.preventDefault(); // Mencegah scroll layar
+            
+            // Update posisi vertikal tombol mengikuti jari
+            const deltaY = clientY - startY;
+            container.style.top = (initialTop + deltaY) + "px";
+
+            // Visual effect saat digeser (sedikit transparan)
+            container.style.opacity = "0.8";
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            btn.style.cursor = 'grab';
+            container.style.opacity = "1";
+            container.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'; // Efek membal (bounce)
+
+            // LOGIKA SNAP (MAGNET)
+            // Cek posisi terakhir sentuhan
+            const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+            const windowWidth = window.innerWidth;
+
+            // Jika posisi tombol ada di separuh kiri layar -> Tempel ke KIRI
+            if (clientX < windowWidth / 2) {
+                container.style.left = "0";
+                container.style.right = "auto";
+                btn.style.borderRadius = "0 50px 50px 0"; // Balik lengkungan
+                btn.style.borderLeft = "none";
+                btn.style.borderRight = "1px solid rgba(255, 255, 255, 0.2)";
+            } 
+            // Jika posisi tombol ada di separuh kanan layar -> Tempel ke KANAN
+            else {
+                container.style.left = "auto";
+                container.style.right = "0";
+                btn.style.borderRadius = "50px 0 0 50px"; // Balik lengkungan
+                btn.style.borderRight = "none";
+                btn.style.borderLeft = "1px solid rgba(255, 255, 255, 0.2)";
+            }
+
+            // Batasi agar tidak hilang ke atas/bawah layar
+            let finalTop = parseInt(container.style.top);
+            if (finalTop < 50) container.style.top = "50px";
+            if (finalTop > window.innerHeight - 80) container.style.top = (window.innerHeight - 80) + "px";
+
+            // LOGIKA KLIK (Navigasi)
+            // Jika user tidak menggeser (hanya tap), maka pindah halaman
+            if (!hasMoved) {
+                window.location.href = targetUrl;
+            }
+        }
+    })();
+</script>
+
 </body>
 </html>
