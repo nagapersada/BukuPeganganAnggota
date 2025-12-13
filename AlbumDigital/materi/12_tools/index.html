@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DV DATABASE">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/database.png">
+
+  <title>DV TEAM - Database (iOS Optimized)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* * =========================================
+     * TEMA: DARK LUXURY + NEON TOUCH EFFECT
+     * =========================================
+     */
+
+    :root {
+      --bg-dark: #0f172a;
+      --card-dark: #1e293b;
+      --text-main: #f8fafc;
+      --accent: #6366f1;
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      --fab-size: 60px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    
+    html, body {
+      width: 100%; min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      overflow-y: auto; overflow-x: hidden;
+      /* Smooth scrolling untuk iOS */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    body::before {
+        content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle at 50% 100%, #1e1b4b 0%, #0f172a 60%);
+        pointer-events: none; z-index: -1;
+    }
+
+    /* FIX IPHONE INPUT ZOOM: Font input harus minimal 16px */
+    input, select, textarea {
+        font-size: 16px !important; 
+    }
+
+    /* === SPLASH SCREEN === */
+    #splash {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #020617;
+      display: flex; justify-content: center; align-items: center; flex-direction: column;
+      z-index: 99999;
+    }
+    #splash h1 {
+        font-family: 'Rajdhani', sans-serif; font-size: 2.5rem; margin-bottom: 30px;
+        text-align: center; color: white; letter-spacing: 2px;
+    }
+    #splash button {
+      padding: 15px 30px; margin: 10px; width: 80%; max-width: 300px;
+      background: rgba(255,255,255,0.05); color: white;
+      border: 1px solid #6366f1; border-radius: 4px;
+      font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    /* === HEADER === */
+    .header-group {
+        position: sticky; top: 0;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px); /* Support Safari iOS */
+        padding: 15px 20px; z-index: 50;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex; justify-content: space-between; align-items: center;
+        /* Aman untuk notch iPhone */
+        padding-top: env(safe-area-inset-top, 20px); 
+    }
+    .main-title {
+        font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; 
+        text-transform: uppercase; letter-spacing: 2px;
+        background: linear-gradient(to right, #fff, #94a3b8);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .data-count-badge {
+        font-size: 0.8rem; background: #334155; padding: 4px 10px; border-radius: 20px; color: #cbd5e1;
+    }
+
+    /* === LIST DATA === */
+    .list-container { 
+        padding: 20px; 
+        padding-bottom: 120px;
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    .card {
+        background: var(--card-dark);
+        margin-bottom: 15px; padding: 18px;
+        border-radius: 12px; border-left: 4px solid #6366f1;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .card.selected { border: 2px solid #f59e0b; background: rgba(245, 158, 11, 0.05); }
+
+    /* EFEK MENYALA SAAT DISENTUH (ACTIVE STATE) */
+    .card:active {
+        transform: scale(0.97); 
+        background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
+        box-shadow: 0 0 25px rgba(99, 102, 241, 0.5); 
+        border-left-color: #f59e0b; 
+        border-top-color: rgba(255,255,255,0.3);
+        z-index: 10;
+    }
+
+    .card-header { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #334155; }
+    .card-name { font-size: 1.15rem; font-weight: 700; color: #fff; pointer-events: none; }
+    .card-badge { font-size: 0.75rem; background: rgba(99, 102, 241, 0.2); color: #818cf8; padding: 2px 8px; border-radius: 4px; pointer-events: none; }
+    
+    .data-row { display: flex; align-items: flex-start; margin-bottom: 6px; font-size: 0.95rem; color: #cbd5e1; pointer-events: none; }
+    .data-icon { margin-right: 10px; width: 20px; text-align: center; color: #6366f1; }
+    .text-content { color: #f1f5f9; line-height: 1.4; font-weight: 500; }
+
+    .note-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 0.9rem; color: #94a3b8; border-left: 2px solid #64748b; pointer-events: none; }
+    
+    .card-actions { display: flex; gap: 8px; margin-top: 15px; }
+    .btn-action { flex: 1; padding: 10px 8px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; z-index: 5; }
+    .btn-action:active { transform: scale(0.95); opacity: 0.8; } 
+    
+    .btn-update { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+    .btn-edit-data { background: #334155; color: white; border: 1px solid #475569; }
+    .btn-delete { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* === FAB BUTTON === */
+    .fab-btn {
+        position: fixed; bottom: 30px; right: 25px;
+        width: var(--fab-size); height: var(--fab-size);
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+        z-index: 9000; cursor: pointer;
+        transition: transform 0.3s, opacity 0.2s;
+        border: 2px solid rgba(255,255,255,0.2);
+        /* Hindari area gesture bar iPhone */
+        margin-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .fab-btn:active { transform: scale(0.9); }
+    .fab-icon { font-size: 2rem; color: white; }
+    .fab-btn.hidden { opacity: 0; pointer-events: none; transform: scale(0); }
+
+    /* === CONTROL PANEL === */
+    .control-panel-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        z-index: 8000;
+        opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        display: flex; align-items: flex-end;
+    }
+    .control-panel-overlay.active { opacity: 1; pointer-events: all; }
+
+    .control-panel-content {
+        width: 100%;
+        background: #1e293b;
+        border-top-left-radius: 25px; border-top-right-radius: 25px;
+        padding: 25px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        max-height: 85vh; 
+        overflow-y: auto; 
+        padding-bottom: 200px;
+    }
+    .control-panel-overlay.active .control-panel-content { transform: translateY(0); }
+
+    .close-header-btn {
+        position: absolute;
+        top: 20px; right: 20px;
+        background: rgba(239, 68, 68, 0.1); color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        width: 35px; height: 35px; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        cursor: pointer; font-weight: bold; font-size: 1.2rem;
+        z-index: 20;
+    }
+
+    .panel-handle { width: 50px; height: 5px; background: #475569; margin: 0 auto 10px auto; border-radius: 10px; }
+
+    /* FORM & TOOLS */
+    .search-box { margin-bottom: 20px; margin-top: 10px; }
+    .search-box input {
+        width: 100%; padding: 14px 15px; background: #0f172a; border: 1px solid #6366f1;
+        color: white; border-radius: 10px; 
+    }
+
+    .form-grid { display: grid; gap: 15px; }
+    .form-grid input, .form-grid select {
+        width: 100%; padding: 14px; background: #0f172a; border: 1px solid #334155;
+        color: white; border-radius: 8px; 
+    }
+
+    .tool-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+    .tool-btn {
+        padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: white;
+        display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.8rem;
+    }
+    .btn-primary { grid-column: 1 / -1; background: var(--gradient-primary); font-size: 1.1rem; padding: 15px; text-transform: uppercase; letter-spacing: 1px; }
+    .btn-secondary { background: #334155; border: 1px solid #475569; }
+    .btn-danger { background: #ef4444; grid-column: 1/-1; margin-top: 10px; }
+
+    mark { background: #f59e0b; color: #000; padding: 0 2px; border-radius: 2px; }
+
+    /* Modal Umum */
+    .modal-universal {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center;
+    }
+    .modal-box { background: #1e293b; padding: 25px; width: 85%; border-radius: 15px; text-align: center; border: 1px solid #475569; }
+    .modal-box textarea { width: 100%; height: 100px; background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; border-radius: 8px; margin: 15px 0; font-size: 16px; }
+
+  </style>
+</head>
+<body>
+
+  <div id="splash">
+    <h1>DV TEAM<br><span style="font-size:1rem; opacity:0.7;">DATABASE v2 iOS</span></h1>
+    <button onclick="mulaiBaru()">DATABASE BARU</button>
+    <button onclick="triggerImpor()">LOAD DATA (RESTORE)</button>
+  </div>
+  <input type="file" id="file-importer" accept=".json" style="display: none;">
+
+  <div class="fab-btn" onclick="bukaPanel()" id="fab-trigger">
+      <span class="fab-icon">+</span>
+  </div>
+
+  <div class="control-panel-overlay" id="control-panel" onclick="tutupJikaKlikLuar(event)">
+      <div class="control-panel-content">
+          <button class="close-header-btn" onclick="tutupPanel()">✕</button>
+          
+          <div class="panel-handle"></div>
+          <h3 style="text-align:center; margin-bottom:5px; color:#fff; font-family:'Rajdhani', sans-serif;">INPUT & KONTROL</h3>
+          
+          <div class="search-box">
+              <input type="text" id="search" placeholder="🔍 Cari Nama, Alamat, Status..." autocomplete="off">
+          </div>
+
+          <form id="form-input-nama">
+            <div class="form-grid">
+                <input type="text" id="input-nama" placeholder="Nama Lengkap" required>
+                <input type="text" id="input-alamat" placeholder="Alamat / Wilayah" required>
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px;">
+                    <input type="text" id="input-hp" placeholder="No. HP / WA" required inputmode="numeric">
+                    <select id="input-keterangan" required>
+                    <option value="" disabled selected>Status</option>
+                    <option>Keluarga</option>
+                    <option>Tetangga</option>
+                    <option>Teman Dekat</option>
+                    <option>Relasi</option>
+                    <option>Lain-lain</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tool-buttons">
+                <button type="submit" id="btn-tambah" class="tool-btn btn-primary">SIMPAN DATA</button>
+                <button type="button" id="btn-edit" class="tool-btn" style="background:var(--gradient-gold); color:#000; grid-column:1/-1; display:none;" onclick="simpanPerubahanEdit()">UPDATE PERUBAHAN</button>
+                
+                <button type="button" class="tool-btn btn-secondary" onclick="tampilkanJumlah()">
+                    <span>📊</span> Total
+                </button>
+                <button type="button" class="tool-btn btn-secondary" onclick="bukaModalSort()">
+                    <span>🌪️</span> Filter
+                </button>
+                <button type="button" class="tool-btn btn-secondary" style="background:#10b981;" onclick="eksporData()">
+                    <span>💾</span> Backup
+                </button>
+                
+                <button type="button" id="btn-batal-edit" class="tool-btn btn-danger" style="display:none;" onclick="batalEdit()">BATAL EDIT</button>
+            </div>
+            
+            <div style="height: 50px;"></div>
+          </form>
+      </div>
+  </div>
+
+  <div class="container" id="app-container" style="display:none;">
+    <div class="header-group">
+        <div class="main-title">DAFTAR NAMA</div>
+        <div class="data-count-badge" id="header-count">0 Data</div>
+    </div>
+    <div class="list-container" id="card-container"></div>
+  </div>
+
+  <div id="modal" class="modal-universal">
+      <div class="modal-box">
+          <h3>UPDATE CATATAN</h3>
+          <textarea id="aksi-textarea" placeholder="Tulis progres..."></textarea>
+          <div style="display:flex; justify-content:flex-end; gap:10px;">
+              <button onclick="tutupModal()" style="padding:10px; background:transparent; color:#aaa; border:none;">TUTUP</button>
+              <button onclick="simpanAksi()" style="padding:10px 20px; background:#6366f1; color:white; border:none; border-radius:5px;">SIMPAN</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modal-jumlah" class="modal-universal">
+      <div class="modal-box">
+          <h3>INFO DATA</h3>
+          <p id="jumlah-text" style="margin:20px 0; color:white; font-size:1.2rem;"></p>
+          <button onclick="document.getElementById('modal-jumlah').style.display='none'" style="padding:10px 20px; background:#6366f1; color:white; border:none; border-radius:5px;">OK</button>
+      </div>
+  </div>
+
+  <div id="modal-sort" class="modal-universal">
+      <div class="modal-box">
+          <h3>FILTER KATEGORI</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0;">
+              <button onclick="filterData('Keluarga')" style="padding:10px; background:#334155; color:white; border:none; border-radius:5px;">Keluarga</button>
+              <button onclick="filterData('Tetangga')" style="padding:10px; background:#334155; color:white; border:none; border-radius:5px;">Tetangga</button>
+              <button onclick="filterData('Teman Dekat')" style="padding:10px; background:#334155; color:white; border:none; border-radius:5px;">Teman</button>
+              <button onclick="filterData('Relasi')" style="padding:10px; background:#334155; color:white; border:none; border-radius:5px;">Relasi</button>
+              <button onclick="filterData('')" style="grid-column:1/-1; background:#ef4444; color:white; border:none; padding:10px; border-radius:5px;">RESET FILTER</button>
+          </div>
+          <button onclick="document.getElementById('modal-sort').style.display='none'" style="background:transparent; color:#aaa; border:none;">TUTUP</button>
+      </div>
+  </div>
+
+  <script>
+    let data = [];
+    let selectedIndex = null;
+    let editIndex = null;
+    let currentCategoryFilter = '';
+
+    const splash = document.getElementById('splash');
+    const appContainer = document.getElementById('app-container');
+    const controlPanel = document.getElementById('control-panel');
+    const fabTrigger = document.getElementById('fab-trigger');
+    const cardContainer = document.getElementById('card-container');
+    const searchInput = document.getElementById('search');
+    const headerCount = document.getElementById('header-count');
+    const form = document.getElementById('form-input-nama');
+    const btnTambah = document.getElementById('btn-tambah');
+    const btnEdit = document.getElementById('btn-edit');
+    const btnBatalEdit = document.getElementById('btn-batal-edit');
+
+    // === TOGGLE LOGIC ===
+    function bukaPanel() {
+        controlPanel.classList.add('active');
+        fabTrigger.classList.add('hidden');
+        // Fokus input bisa dihilangkan di iOS jika mengganggu (keyboard muncul tiba-tiba)
+        if(editIndex === null) document.getElementById('input-nama').focus();
+    }
+
+    function tutupPanel() {
+        controlPanel.classList.remove('active');
+        fabTrigger.classList.remove('hidden');
+        document.activeElement.blur(); // Tutup keyboard di HP
+    }
+    
+    function tutupJikaKlikLuar(e) {
+        if(e.target === controlPanel) tutupPanel();
+    }
+
+    // === STARTUP & IMPORT ===
+    function mulaiBaru() {
+        if(confirm("Buat Database Baru? Data lama di layar ini akan hilang (pastikan sudah backup).")) {
+            data = []; simpan(); masukAplikasi();
+        }
+    }
+    
+    function triggerImpor() { 
+        document.getElementById('file-importer').click(); 
+    }
+    
+    document.getElementById('file-importer').onchange = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const importedData = JSON.parse(ev.target.result);
+                if(Array.isArray(importedData)) {
+                    if(confirm(`Ditemukan ${importedData.length} data. Timpa data sekarang?`)){
+                        data = importedData;
+                        simpan(); 
+                        masukAplikasi();
+                        alert("Data Berhasil Dimuat!");
+                    }
+                } else {
+                    alert("Format file salah!");
+                }
+            } catch(err) { alert("File rusak atau bukan format JSON!"); }
+        };
+        reader.readAsText(file);
+    };
+
+    function masukAplikasi() {
+        splash.style.display = 'none';
+        appContainer.style.display = 'block';
+        baca();
+        renderCards();
+    }
+
+    // === STORAGE ===
+    function simpan() { localStorage.setItem('dvteam_clean_db', JSON.stringify(data)); updateHeaderCount(); }
+    function baca() {
+        const stored = localStorage.getItem('dvteam_clean_db');
+        if(stored) data = JSON.parse(stored);
+        updateHeaderCount();
+    }
+    function updateHeaderCount() { headerCount.textContent = data.length + " Data"; }
+
+    // === RENDER & SEARCH ===
+    function highlight(text, keyword) {
+        if (!text) return '';
+        if (!keyword) return text;
+        const cleanKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(`(${cleanKeyword})`, 'gi');
+        return text.replace(regex, '<mark>$1</mark>');
+    }
+
+    function renderCards() {
+        cardContainer.innerHTML = '';
+        const keyword = searchInput.value.toLowerCase().trim();
+        const filtered = data.filter(item => {
+            const matchCat = !currentCategoryFilter || item.keterangan === currentCategoryFilter;
+            const matchKey = !keyword || (
+                (item.nama || '').toLowerCase().includes(keyword) || 
+                (item.alamat || '').toLowerCase().includes(keyword) ||
+                (item.hp || '').toLowerCase().includes(keyword) ||
+                (item.keterangan || '').toLowerCase().includes(keyword) ||
+                (item.aksi && item.aksi.toLowerCase().includes(keyword))
+            );
+            return matchCat && matchKey;
+        });
+
+        filtered.forEach(item => {
+            const idx = data.indexOf(item);
+            const div = document.createElement('div');
+            // 'ontouchstart' penting agar iOS merespon active state CSS
+            div.setAttribute('ontouchstart', ''); 
+            div.className = `card ${editIndex === idx ? 'selected' : ''}`;
+            div.innerHTML = `
+                <div class="card-header">
+                    <span class="card-name">${highlight(item.nama, keyword)}</span>
+                    <span class="card-badge">${highlight(item.keterangan, keyword)}</span>
+                </div>
+                <div class="data-row"><span class="data-icon">📍</span><span class="text-content">${highlight(item.alamat, keyword)}</span></div>
+                <div class="data-row"><span class="data-icon">📞</span><a href="https://wa.me/${formatWA(item.hp)}" target="_blank" class="text-content" style="color:#818cf8; text-decoration:none;">${highlight(item.hp, keyword)}</a></div>
+                <div class="note-box">
+                    <strong>Catatan:</strong><br>
+                    ${item.aksi ? highlight(item.aksi, keyword) : '<i style="opacity:0.6;">Belum ada catatan</i>'}
+                </div>
+                <div class="card-actions">
+                    <button class="btn-action btn-update" onclick="bukaModalCatatan(${idx})">CATATAN</button>
+                    <button class="btn-action btn-edit-data" onclick="modeEdit(${idx})">EDIT</button>
+                    <button class="btn-action btn-delete" onclick="hapusData(${idx})">HAPUS</button>
+                </div>
+            `;
+            cardContainer.appendChild(div);
+        });
+    }
+
+    function formatWA(nomor) {
+        // Pembersih nomor untuk link WA
+        let clean = nomor.replace(/[^0-9]/g, '');
+        if(clean.startsWith('0')) clean = '62' + clean.substring(1);
+        return clean;
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if(editIndex !== null) return; 
+
+        const nama = document.getElementById('input-nama').value;
+        const alamat = document.getElementById('input-alamat').value;
+        const hp = document.getElementById('input-hp').value;
+        const ket = document.getElementById('input-keterangan').value;
+
+        data.push({ nama, alamat, hp, keterangan: ket, aksi: '' });
+        simpan();
+        form.reset();
+        
+        // Jangan hapus search saat input agar workflow cepat
+        // searchInput.value = ''; 
+        
+        renderCards();
+        alert("Data Tersimpan!");
+        document.getElementById('input-nama').focus();
+    });
+
+    function modeEdit(idx) {
+        editIndex = idx;
+        const item = data[idx];
+        document.getElementById('input-nama').value = item.nama;
+        document.getElementById('input-alamat').value = item.alamat;
+        document.getElementById('input-hp').value = item.hp;
+        document.getElementById('input-keterangan').value = item.keterangan;
+
+        btnTambah.style.display = 'none';
+        btnEdit.style.display = 'block';
+        btnBatalEdit.style.display = 'block';
+        bukaPanel();
+    }
+
+    function simpanPerubahanEdit() {
+        if(editIndex === null) return;
+        data[editIndex].nama = document.getElementById('input-nama').value;
+        data[editIndex].alamat = document.getElementById('input-alamat').value;
+        data[editIndex].hp = document.getElementById('input-hp').value;
+        data[editIndex].keterangan = document.getElementById('input-keterangan').value;
+        simpan(); batalEdit(); renderCards(); tutupPanel();
+    }
+
+    function batalEdit() {
+        editIndex = null;
+        form.reset();
+        btnTambah.style.display = 'block';
+        btnEdit.style.display = 'none';
+        btnBatalEdit.style.display = 'none';
+        renderCards();
+    }
+
+    function hapusData(idx) {
+        if(confirm("Hapus data ini selamanya?")) {
+            data.splice(idx, 1); simpan(); renderCards();
+        }
+    }
+
+    function eksporData() {
+        if(data.length === 0) { alert("Belum ada data untuk di-backup."); return; }
+        
+        // Buat nama file unik dengan Tanggal & Jam
+        const now = new Date();
+        const tgl = now.getDate() + '-' + (now.getMonth()+1) + '-' + now.getFullYear();
+        const jam = now.getHours() + '.' + now.getMinutes();
+        const fileName = `DVTEAM_BACKUP_${tgl}_${jam}.json`;
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function bukaModalCatatan(idx) {
+        selectedIndex = idx;
+        document.getElementById('aksi-textarea').value = data[idx].aksi || '';
+        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('aksi-textarea').focus();
+    }
+    function tutupModal() { document.getElementById('modal').style.display = 'none'; }
+    function simpanAksi() {
+        if(selectedIndex !== null) {
+            data[selectedIndex].aksi = document.getElementById('aksi-textarea').value;
+            simpan(); renderCards(); tutupModal();
+        }
+    }
+
+    function tampilkanJumlah() {
+        document.getElementById('jumlah-text').innerHTML = `Tampil: <b>${cardContainer.children.length}</b><br>Total Database: <b>${data.length}</b>`;
+        document.getElementById('modal-jumlah').style.display = 'flex';
+    }
+    function bukaModalSort() { document.getElementById('modal-sort').style.display = 'flex'; }
+    function filterData(cat) { currentCategoryFilter = cat; renderCards(); document.getElementById('modal-sort').style.display = 'none'; }
+
+    searchInput.addEventListener('input', renderCards);
+
+    window.onload = () => { baca(); if(data.length > 0) masukAplikasi(); };
+  </script>
+</body>
+</html>
