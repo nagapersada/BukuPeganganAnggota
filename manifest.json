@@ -1,6 +1,6 @@
 {
-  "name": "Buku Pegangan DVNP",
-  "short_name": "DVNP",
+  "name": "Buku Pegangan NP",
+  "short_name": "BukuNP",
   "start_url": ".",
   "scope": ".",
   "display": "fullscreen",
