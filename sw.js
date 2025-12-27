@@ -1,5 +1,5 @@
 // *** VERSI FINAL v10: Update nama cache ini agar HP otomatis update ***
-const CACHE_NAME = 'dvnp-portal-cache-v10-final';
+const CACHE_NAME = 'dvnp-portal-cache-v15-final';
 
 // Daftar file inti
 const FILES_TO_CACHE = [
